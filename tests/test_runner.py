@@ -61,7 +61,28 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             self.assertIn("fake-case", stdout.getvalue())
 
-    def _write_fake_case(self, root: Path) -> Path:
+    def test_runner_records_failed_verification_without_raising(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            case_dir = self._write_fake_case(root, verify_passed=False)
+            agent_path = self._write_fake_agent(root)
+            results_dir = root / "results"
+
+            runner = OpsBenchRunner(use_docker=False)
+            record = runner.run(
+                case_dir=case_dir,
+                agent_path=agent_path,
+                results_dir=results_dir,
+                timeout_sec=20,
+            )
+
+            self.assertTrue(record["injection_passed"])
+            self.assertFalse(record["verification_passed"])
+            self.assertEqual(record["score"], 0.0)
+            recorded = json.loads((results_dir / "runs.jsonl").read_text(encoding="utf-8"))
+            self.assertEqual(recorded["run_id"], record["run_id"])
+
+    def _write_fake_case(self, root: Path, verify_passed: bool = True) -> Path:
         case_dir = root / "cases" / "fake-case"
         scripts_dir = case_dir / "scripts"
         hidden_dir = case_dir / "hidden"
@@ -139,19 +160,22 @@ class RunnerTests(unittest.TestCase):
             + "\n",
             encoding="utf-8",
         )
+        verify_exit = 0 if verify_passed else 1
         (scripts_dir / "verify.py").write_text(
             textwrap.dedent(
-                """
+                f"""
                 import argparse
                 import json
+                import sys
 
                 parser = argparse.ArgumentParser()
                 parser.add_argument("--case-dir", required=True)
                 parser.parse_args()
-                print(json.dumps({
-                    "passed": True,
-                    "checks": [{"name": "fake_verify", "passed": True}]
-                }))
+                print(json.dumps({{
+                    "passed": {str(verify_passed)},
+                    "checks": [{{"name": "fake_verify", "passed": {str(verify_passed)}}}]
+                }}))
+                sys.exit({verify_exit})
                 """
             ).strip()
             + "\n",

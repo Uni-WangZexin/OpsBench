@@ -86,9 +86,10 @@ class OpsBenchRunner:
                 trace_dir,
                 env,
                 timeout=effective_timeout,
+                check=False,
             )
 
-            phases["verify"] = self._run_script("verify", case, trace_dir, env)
+            phases["verify"] = self._run_script("verify", case, trace_dir, env, check=False)
             verification_result = _parse_last_json_object(phases["verify"]["stdout"])
         finally:
             if self.use_docker:
@@ -140,6 +141,7 @@ class OpsBenchRunner:
         trace_dir: Path,
         env: dict[str, str],
         timeout: int = 300,
+        check: bool = True,
     ) -> dict[str, Any]:
         return self._run_command(
             phase,
@@ -152,6 +154,7 @@ class OpsBenchRunner:
             trace_dir,
             env,
             timeout=timeout,
+            check=check,
         )
 
     def _run_command(
