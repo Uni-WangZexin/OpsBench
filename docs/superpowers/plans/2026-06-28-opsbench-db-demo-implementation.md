@@ -74,24 +74,24 @@ git commit -m "feat: add OpsBench core models"
 - Create: `opsbench/__main__.py`
 - Create: `bin/opsbench`
 
-- [ ] **Step 1: Write failing runner tests**
+- [x] **Step 1: Write failing runner tests**
 
 Create `tests/test_runner.py` with a temporary local case package whose inject/check/verify scripts emit JSON and whose fake agent writes a trace. Run the runner with `use_docker=False` and assert lifecycle phases, generated task file, verification result, hidden labels in the recorded JSONL, and trace directory creation.
 
-- [ ] **Step 2: Run runner tests and verify RED**
+- [x] **Step 2: Run runner tests and verify RED**
 
 Run: `python3 -m unittest tests.test_runner -v`
 Expected: fails because `opsbench.runner` does not exist.
 
-- [ ] **Step 3: Implement runner**
+- [x] **Step 3: Implement runner**
 
 Create `opsbench/runner.py` with `OpsBenchRunner.run(case_dir, agent_path, results_dir, timeout_sec, use_docker=True)`. It loads the case, starts Docker Compose when enabled, runs inject/check/agent/verify, records logs and result JSONL, writes `task.md` and a generated `verify.sh`, includes hidden labels in result records, and cleans up Docker Compose when enabled.
 
-- [ ] **Step 4: Implement CLI**
+- [x] **Step 4: Implement CLI**
 
 Create `opsbench/cli.py` with `run` and `leaderboard` subcommands. Create `opsbench/__main__.py` and `bin/opsbench` wrappers.
 
-- [ ] **Step 5: Run runner tests and verify GREEN**
+- [x] **Step 5: Run runner tests and verify GREEN**
 
 Run: `python3 -m unittest tests.test_cases tests.test_results tests.test_runner -v`
 Expected: passes.
