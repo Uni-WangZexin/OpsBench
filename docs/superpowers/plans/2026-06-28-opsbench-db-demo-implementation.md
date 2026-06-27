@@ -120,11 +120,11 @@ git commit -m "feat: add OpsBench runner CLI"
 - Create: `cases/postgres-missing-index-001/hidden/labels.yaml`
 - Create: `cases/postgres-missing-index-001/hidden/oracle_fix.sql`
 
-- [ ] **Step 1: Add case package files**
+- [x] **Step 1: Add case package files**
 
 Create a PostgreSQL Compose environment with a single `db` service. Initialize an `orders` table with deterministic generated data and a healthy `idx_orders_customer_id` index. The injection script drops that index. The injection check confirms the index is absent. The verifier measures PostgreSQL `EXPLAIN (ANALYZE, FORMAT JSON)` execution time for the target workload and checks thresholds from the manifest.
 
-- [ ] **Step 2: Validate manifest through the existing testable loader**
+- [x] **Step 2: Validate manifest through the existing testable loader**
 
 Run: `python3 -m opsbench.cli validate --case cases/postgres-missing-index-001`
 Expected: prints the case id and exits `0`.

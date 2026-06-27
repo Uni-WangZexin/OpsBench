@@ -1,0 +1,1 @@
+This first demo keeps the application layer intentionally minimal and exercises the order-history workload directly through PostgreSQL. Future cases can replace this directory with a service container while keeping the same OpsBench case contract.

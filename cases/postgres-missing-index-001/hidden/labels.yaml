@@ -1,0 +1,8 @@
+{
+  "domain": "database",
+  "system": "postgresql",
+  "fault_type": "performance.missing_index",
+  "symptom": "slow_query",
+  "root_cause": "missing_index_on_orders_customer_id",
+  "expected_fix_type": "schema_index"
+}

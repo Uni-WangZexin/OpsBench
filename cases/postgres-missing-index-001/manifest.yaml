@@ -1,0 +1,24 @@
+{
+  "id": "postgres-missing-index-001",
+  "domain": "database",
+  "environment": {
+    "compose_file": "docker-compose.yaml",
+    "services": ["db"]
+  },
+  "scripts": {
+    "inject": "scripts/inject.py",
+    "check_injected": "scripts/check_injected.py",
+    "verify": "scripts/verify.py"
+  },
+  "task": "task.md",
+  "hidden_metadata": "hidden/labels.yaml",
+  "timeouts": {
+    "agent_sec": 300
+  },
+  "verification": {
+    "customer_id": 4242,
+    "samples": 3,
+    "average_ms_threshold": 10.0,
+    "p95_ms_threshold": 20.0
+  }
+}
