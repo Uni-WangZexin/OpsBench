@@ -18,7 +18,7 @@
   "verification": {
     "customer_id": 4242,
     "samples": 3,
-    "average_ms_threshold": 10.0,
-    "p95_ms_threshold": 20.0
+    "average_ms_threshold": 5.0,
+    "p95_ms_threshold": 10.0
   }
 }

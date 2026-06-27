@@ -59,7 +59,7 @@ class OpsBenchRunner:
             if self.use_docker:
                 phases["start"] = self._run_command(
                     "start",
-                    _compose_cmd(case, compose_project, ["up", "-d", "--build"]),
+                    _compose_cmd(case, compose_project, ["up", "-d", "--build", "--wait"]),
                     trace_dir,
                     env,
                     timeout=300,

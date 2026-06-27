@@ -65,6 +65,25 @@ def psql(case_dir: Path, sql: str, timeout: int = 120) -> subprocess.CompletedPr
     )
 
 
+def psql_with_retries(
+    case_dir: Path,
+    sql: str,
+    attempts: int = 5,
+    timeout: int = 120,
+) -> subprocess.CompletedProcess[str]:
+    last_result: subprocess.CompletedProcess[str] | None = None
+    for attempt in range(attempts):
+        result = psql(case_dir, sql, timeout=timeout)
+        if result.returncode == 0:
+            return result
+        last_result = result
+        if attempt < attempts - 1:
+            time.sleep(1)
+    if last_result is None:
+        raise RuntimeError("psql retry loop did not run")
+    return last_result
+
+
 def wait_for_db(case_dir: Path, timeout: int = 60) -> None:
     deadline = time.monotonic() + timeout
     last_error = ""
@@ -75,6 +94,24 @@ def wait_for_db(case_dir: Path, timeout: int = 60) -> None:
         last_error = result.stderr.strip() or result.stdout.strip()
         time.sleep(1)
     raise RuntimeError(f"database did not become ready: {last_error}")
+
+
+def wait_for_index(case_dir: Path, index_name: str, timeout: int = 120) -> None:
+    deadline = time.monotonic() + timeout
+    last_error = ""
+    escaped_index = index_name.replace("'", "''")
+    sql = (
+        "SELECT count(*) FROM pg_indexes "
+        "WHERE schemaname = 'public' "
+        f"AND indexname = '{escaped_index}';"
+    )
+    while time.monotonic() < deadline:
+        result = psql(case_dir, sql, timeout=10)
+        if result.returncode == 0 and result.stdout.strip() == "1":
+            return
+        last_error = result.stderr.strip() or result.stdout.strip()
+        time.sleep(1)
+    raise RuntimeError(f"index {index_name} did not become ready: {last_error}")
 
 
 def load_manifest(case_dir: Path) -> dict[str, Any]:

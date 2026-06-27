@@ -166,16 +166,16 @@ git commit -m "feat: add built-in OpsBench agents"
 **Files:**
 - Create: `README.md`
 
-- [ ] **Step 1: Add README**
+- [x] **Step 1: Add README**
 
 Document the goal, repository layout, commands for `noop-agent`, `oracle-agent`, leaderboard usage, and how third-party agents integrate through the CLI protocol.
 
-- [ ] **Step 2: Run unit tests**
+- [x] **Step 2: Run unit tests**
 
 Run: `python3 -m unittest discover -v`
 Expected: all tests pass.
 
-- [ ] **Step 3: Run Docker smoke tests**
+- [x] **Step 3: Run Docker smoke tests**
 
 Run:
 

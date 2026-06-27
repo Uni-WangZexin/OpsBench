@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from common import emit, psql, wait_for_db
+from common import emit, psql_with_retries, wait_for_db, wait_for_index
 
 
 def main() -> int:
@@ -13,9 +13,11 @@ def main() -> int:
     case_dir = Path(args.case_dir)
 
     wait_for_db(case_dir)
-    result = psql(
+    wait_for_index(case_dir, "idx_orders_customer_id")
+    result = psql_with_retries(
         case_dir,
         "DROP INDEX IF EXISTS idx_orders_customer_id; ANALYZE orders;",
+        attempts=5,
         timeout=120,
     )
     emit(
