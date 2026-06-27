@@ -144,11 +144,11 @@ git commit -m "feat: add PostgreSQL missing index case"
 - Create: `agents/noop-agent/run.sh`
 - Create: `agents/oracle-agent/run.sh`
 
-- [ ] **Step 1: Add `noop-agent`**
+- [x] **Step 1: Add `noop-agent`**
 
 Create a Bash executable that parses runner arguments, writes `trace.md` under `OPSBENCH_TRACE_DIR`, records that no repair was attempted, and exits `0`.
 
-- [ ] **Step 2: Add `oracle-agent`**
+- [x] **Step 2: Add `oracle-agent`**
 
 Create a Bash executable that writes a minimal ReAct-style trace, applies `hidden/oracle_fix.sql` through Docker Compose, optionally runs `OPSBENCH_VERIFY_CMD`, and exits `0`.
 
