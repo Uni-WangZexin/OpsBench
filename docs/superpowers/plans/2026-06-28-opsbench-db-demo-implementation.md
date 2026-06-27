@@ -56,7 +56,7 @@ Create `opsbench/results.py` with `append_run(path, record)` and `load_runs(path
 Run: `python3 -m unittest tests.test_cases tests.test_results -v`
 Expected: passes.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 Run:
 
@@ -96,7 +96,7 @@ Create `opsbench/cli.py` with `run` and `leaderboard` subcommands. Create `opsbe
 Run: `python3 -m unittest tests.test_cases tests.test_results tests.test_runner -v`
 Expected: passes.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -129,7 +129,7 @@ Create a PostgreSQL Compose environment with a single `db` service. Initialize a
 Run: `python3 -m opsbench.cli validate --case cases/postgres-missing-index-001`
 Expected: prints the case id and exits `0`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 Run:
 
@@ -152,7 +152,7 @@ Create a Bash executable that parses runner arguments, writes `trace.md` under `
 
 Create a Bash executable that writes a minimal ReAct-style trace, applies `hidden/oracle_fix.sql` through Docker Compose, optionally runs `OPSBENCH_VERIFY_CMD`, and exits `0`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 Run:
 
@@ -187,7 +187,7 @@ python3 -m opsbench.cli leaderboard --results results/runs.jsonl
 
 Expected: `noop-agent` records `verification_passed=false`, `oracle-agent` records `verification_passed=true`, and leaderboard shows both agents.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Run:
 
