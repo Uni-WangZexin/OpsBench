@@ -20,38 +20,38 @@
 - Create: `opsbench/results.py`
 - Create: `opsbench/leaderboard.py`
 
-- [ ] **Step 1: Write failing tests for case loading**
+- [x] **Step 1: Write failing tests for case loading**
 
 Create `tests/test_cases.py` with tests that write a temporary JSON-compatible `manifest.yaml`, load it through `load_case`, and assert resolved paths, public fields, scripts, and hidden metadata.
 
-- [ ] **Step 2: Run case tests and verify RED**
+- [x] **Step 2: Run case tests and verify RED**
 
 Run: `python3 -m unittest tests.test_cases -v`
 Expected: fails because `opsbench.cases` does not exist.
 
-- [ ] **Step 3: Implement case loading**
+- [x] **Step 3: Implement case loading**
 
 Create `opsbench/cases.py` with `Case` dataclass and `load_case(path)` that parses JSON-compatible YAML with `json.loads`, validates required keys, and resolves relative paths against the case directory.
 
-- [ ] **Step 4: Run case tests and verify GREEN**
+- [x] **Step 4: Run case tests and verify GREEN**
 
 Run: `python3 -m unittest tests.test_cases -v`
 Expected: passes.
 
-- [ ] **Step 5: Write failing tests for results and leaderboard aggregation**
+- [x] **Step 5: Write failing tests for results and leaderboard aggregation**
 
 Create `tests/test_results.py` with tests for appending JSONL result records, reading them back, and aggregating per-agent pass rate, run count, and average duration.
 
-- [ ] **Step 6: Run result tests and verify RED**
+- [x] **Step 6: Run result tests and verify RED**
 
 Run: `python3 -m unittest tests.test_results -v`
 Expected: fails because `opsbench.results` and `opsbench.leaderboard` are incomplete.
 
-- [ ] **Step 7: Implement result storage and aggregation**
+- [x] **Step 7: Implement result storage and aggregation**
 
 Create `opsbench/results.py` with `append_run(path, record)` and `load_runs(path)`. Create `opsbench/leaderboard.py` with `summarize_runs(runs)` and `format_leaderboard(summary)`.
 
-- [ ] **Step 8: Run result tests and verify GREEN**
+- [x] **Step 8: Run result tests and verify GREEN**
 
 Run: `python3 -m unittest tests.test_cases tests.test_results -v`
 Expected: passes.
