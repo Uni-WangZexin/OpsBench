@@ -312,7 +312,7 @@ git commit -m "feat: add LangChain agent strong tools"
 - Create: `agents/langchain-react-agent/requirements.txt`
 - Create: `tests/test_langchain_agent_entrypoint.py`
 
-- [ ] **Step 1: Write failing entrypoint tests**
+- [x] **Step 1: Write failing entrypoint tests**
 
 Create `tests/test_langchain_agent_entrypoint.py`:
 
@@ -390,13 +390,13 @@ class LangChainAgentEntrypointTests(unittest.TestCase):
             self.assertIn("--case-dir", captured)
 ```
 
-- [ ] **Step 2: Run entrypoint tests to verify RED**
+- [x] **Step 2: Run entrypoint tests to verify RED**
 
 Run: `python3 -m unittest tests.test_langchain_agent_entrypoint -v`
 
 Expected: fails because `agent.py` and wrapper do not exist.
 
-- [ ] **Step 3: Implement entrypoint**
+- [x] **Step 3: Implement entrypoint**
 
 Create `agents/langchain_react_agent/agent.py` with:
 
@@ -408,7 +408,7 @@ Create `agents/langchain_react_agent/agent.py` with:
 
 The LangChain import must be lazy so unit tests can run without installed dependencies.
 
-- [ ] **Step 4: Implement wrapper and requirements**
+- [x] **Step 4: Implement wrapper and requirements**
 
 Create `agents/langchain-react-agent/run.sh`:
 
@@ -430,7 +430,7 @@ langchain-openai>=1.0
 
 Make `run.sh` executable.
 
-- [ ] **Step 5: Run entrypoint tests to verify GREEN**
+- [x] **Step 5: Run entrypoint tests to verify GREEN**
 
 Run: `python3 -m unittest tests.test_langchain_agent_entrypoint -v`
 
