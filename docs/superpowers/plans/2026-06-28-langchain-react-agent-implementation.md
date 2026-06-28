@@ -183,7 +183,7 @@ git commit -m "feat: add LangChain agent config and prompts"
 - Create: `agents/langchain_react_agent/tools.py`
 - Create: `tests/test_langchain_agent_tools.py`
 
-- [ ] **Step 1: Write failing tool tests**
+- [x] **Step 1: Write failing tool tests**
 
 Create `tests/test_langchain_agent_tools.py`:
 
@@ -272,13 +272,13 @@ class LangChainAgentToolTests(unittest.TestCase):
             self.assertTrue(context.verifier_called)
 ```
 
-- [ ] **Step 2: Run tool tests to verify RED**
+- [x] **Step 2: Run tool tests to verify RED**
 
 Run: `python3 -m unittest tests.test_langchain_agent_tools -v`
 
 Expected: fails because `tools.py` does not exist.
 
-- [ ] **Step 3: Implement tool layer**
+- [x] **Step 3: Implement tool layer**
 
 Create `agents/langchain_react_agent/tools.py` with:
 
@@ -289,7 +289,7 @@ Create `agents/langchain_react_agent/tools.py` with:
 - `shell` using `subprocess.run(..., shell=True, cwd=context.case_dir)`, writing full logs to `$trace_dir/tool-shell-N.log`, and returning truncated output to the model.
 - `run_verifier` calling `context.verify_cmd` and setting `context.verifier_called = True`.
 
-- [ ] **Step 4: Run tool tests to verify GREEN**
+- [x] **Step 4: Run tool tests to verify GREEN**
 
 Run: `python3 -m unittest tests.test_langchain_agent_tools -v`
 
