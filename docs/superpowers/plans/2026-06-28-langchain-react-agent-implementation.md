@@ -20,7 +20,7 @@
 - Create: `tests/test_langchain_agent_config.py`
 - Create: `tests/test_langchain_agent_prompts.py`
 
-- [ ] **Step 1: Write failing config tests**
+- [x] **Step 1: Write failing config tests**
 
 Create `tests/test_langchain_agent_config.py`:
 
@@ -72,13 +72,13 @@ class LangChainAgentConfigTests(unittest.TestCase):
                 load_config()
 ```
 
-- [ ] **Step 2: Run config tests to verify RED**
+- [x] **Step 2: Run config tests to verify RED**
 
 Run: `python3 -m unittest tests.test_langchain_agent_config -v`
 
 Expected: fails with `ModuleNotFoundError` for `agents.langchain_react_agent`.
 
-- [ ] **Step 3: Implement config module**
+- [x] **Step 3: Implement config module**
 
 Create importable package directory `agents/langchain_react_agent/` as a code package and keep executable files in `agents/langchain-react-agent/`. Add `agents/langchain_react_agent/config.py`:
 
@@ -113,13 +113,13 @@ def load_config() -> AgentConfig:
 
 Create `agents/__init__.py` and `agents/langchain_react_agent/__init__.py` with short package docstrings.
 
-- [ ] **Step 4: Run config tests to verify GREEN**
+- [x] **Step 4: Run config tests to verify GREEN**
 
 Run: `python3 -m unittest tests.test_langchain_agent_config -v`
 
 Expected: passes.
 
-- [ ] **Step 5: Write failing prompt tests**
+- [x] **Step 5: Write failing prompt tests**
 
 Create `tests/test_langchain_agent_prompts.py`:
 
@@ -152,17 +152,17 @@ class LangChainAgentPromptTests(unittest.TestCase):
         self.assertNotIn("oracle_fix.sql", prompt)
 ```
 
-- [ ] **Step 6: Run prompt tests to verify RED**
+- [x] **Step 6: Run prompt tests to verify RED**
 
 Run: `python3 -m unittest tests.test_langchain_agent_prompts -v`
 
 Expected: fails because `prompts.py` does not exist.
 
-- [ ] **Step 7: Implement prompt module**
+- [x] **Step 7: Implement prompt module**
 
 Create `agents/langchain_react_agent/prompts.py` with `build_system_prompt()` and `build_user_prompt(...)` that match the tests and instruct the agent to use LangChain tools, avoid hidden data, repair the environment, call the verifier, and summarize the outcome.
 
-- [ ] **Step 8: Run Task 1 tests to verify GREEN**
+- [x] **Step 8: Run Task 1 tests to verify GREEN**
 
 Run: `python3 -m unittest tests.test_langchain_agent_config tests.test_langchain_agent_prompts -v`
 
