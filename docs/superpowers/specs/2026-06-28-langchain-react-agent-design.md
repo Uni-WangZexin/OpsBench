@@ -70,7 +70,7 @@ agents/langchain-react-agent/
 
 ## LangChain Agent Shape
 
-Use LangChain's packaged agent constructor. The implementation should prefer the current `langchain.agents.create_agent` API. If the installed LangChain version in the user's environment requires the legacy ReAct helper, the implementation can adapt inside `agent.py`, but it must keep the public behavior and tests the same.
+Use LangChain's packaged ReAct agent constructor. The implementation should prefer `langgraph.prebuilt.create_react_agent`, which is the packaged ReAct agent in the LangChain/LangGraph ecosystem. If the installed LangChain stack only exposes the newer `langchain.agents.create_agent` helper, the implementation can fall back to that packaged agent API, but it must not hand-roll the ReAct loop.
 
 Model construction:
 

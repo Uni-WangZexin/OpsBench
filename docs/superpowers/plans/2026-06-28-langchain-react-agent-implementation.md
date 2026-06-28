@@ -168,7 +168,7 @@ Run: `python3 -m unittest tests.test_langchain_agent_config tests.test_langchain
 
 Expected: passes.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 Run:
 
@@ -295,7 +295,7 @@ Run: `python3 -m unittest tests.test_langchain_agent_tools -v`
 
 Expected: passes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 
@@ -402,7 +402,7 @@ Create `agents/langchain_react_agent/agent.py` with:
 
 - `parse_args(argv=None)`.
 - `write_missing_key_error(trace_dir, exc)`.
-- `build_agent(config, context)`: imports `ChatOpenAI`, `create_agent`, and `create_langchain_tools` lazily.
+- `build_agent(config, context)`: imports `ChatOpenAI`, packaged `create_react_agent` support, and `create_langchain_tools` lazily.
 - `run_agent(args)`: loads config, task text, prompt, tools, invokes LangChain `create_agent(...).invoke({"messages": [...]})`, writes `trace.md` and `final.json`.
 - `main(argv=None)` returning `0` for completed invocation and non-zero for configuration/import failures.
 
@@ -436,7 +436,7 @@ Run: `python3 -m unittest tests.test_langchain_agent_entrypoint -v`
 
 Expected: passes.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run:
 
@@ -451,7 +451,7 @@ git commit -m "feat: add LangChain ReAct agent entrypoint"
 - Modify: `README.md`
 - Modify: `docs/superpowers/plans/2026-06-28-langchain-react-agent-implementation.md`
 
-- [ ] **Step 1: Update README**
+- [x] **Step 1: Update README**
 
 Add a section `LangChain ReAct agent` that documents:
 
@@ -468,13 +468,13 @@ python3 -m opsbench.cli run \
 
 State that this agent has strong shell permissions and depends on network/model behavior, while `oracle-agent` remains the deterministic success baseline.
 
-- [ ] **Step 2: Run full unit tests**
+- [x] **Step 2: Run full unit tests**
 
 Run: `python3 -m unittest discover -v`
 
 Expected: all tests pass.
 
-- [ ] **Step 3: Run deterministic benchmark smoke tests**
+- [x] **Step 3: Run deterministic benchmark smoke tests**
 
 Run:
 
@@ -486,7 +486,7 @@ python3 -m opsbench.cli leaderboard --results /private/tmp/opsbench-langchain-ag
 
 Expected: `noop-agent` records failure, `oracle-agent` records success, leaderboard shows both.
 
-- [ ] **Step 4: Document optional LangChain smoke**
+- [x] **Step 4: Document optional LangChain smoke**
 
 Do not run this unless `DEEPSEEK_API_KEY` is present:
 
@@ -499,7 +499,7 @@ python3 -m opsbench.cli run \
 
 Expected with a valid model setup: the agent writes `trace.md`, `final.json`, and tool logs. Passing the benchmark depends on model behavior.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Run:
 

@@ -16,6 +16,7 @@ opsbench/                         # Python CLI and harness
 cases/postgres-missing-index-001/ # Self-contained PostgreSQL case package
 agents/noop-agent/run.sh          # Failure baseline
 agents/oracle-agent/run.sh        # Minimal ReAct-style success baseline
+agents/langchain-react-agent/     # LangChain ReAct/tool agent wrapper
 results/runs.jsonl                # Generated run records
 results/traces/                   # Generated phase and agent traces
 ```
@@ -57,6 +58,35 @@ Run unit tests:
 ```bash
 python3 -m unittest discover -v
 ```
+
+## LangChain ReAct Agent
+
+`agents/langchain-react-agent/run.sh` is a real model-backed agent. It uses LangChain's packaged agent API with strong shell tools and calls DeepSeek through an OpenAI-compatible endpoint.
+
+Install the optional agent dependencies:
+
+```bash
+python3 -m pip install -r agents/langchain-react-agent/requirements.txt
+```
+
+Configure the model:
+
+```bash
+export DEEPSEEK_API_KEY=...
+export DEEPSEEK_MODEL=deepseek-v4-pro
+export DEEPSEEK_BASE_URL=https://api.deepseek.com
+```
+
+Run it through the same OpsBench protocol:
+
+```bash
+python3 -m opsbench.cli run \
+  --case cases/postgres-missing-index-001 \
+  --agent agents/langchain-react-agent/run.sh \
+  --results-dir results
+```
+
+This agent has a strong `shell` tool and can run arbitrary commands in the case environment. Its pass/fail result depends on model behavior and network/API availability, so `oracle-agent` remains the deterministic success baseline for smoke testing.
 
 ## Agent Protocol
 

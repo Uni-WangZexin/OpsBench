@@ -42,11 +42,10 @@ def write_missing_key_error(trace_dir: Path, exc: Exception) -> None:
 
 def build_agent(config: AgentConfig, context: ToolContext) -> Any:
     try:
-        from langchain.agents import create_agent
         from langchain_openai import ChatOpenAI
     except ImportError as exc:
         raise RuntimeError(
-            "langchain and langchain-openai are required. Install "
+            "langchain-openai is required. Install "
             "agents/langchain-react-agent/requirements.txt"
         ) from exc
 
@@ -56,11 +55,24 @@ def build_agent(config: AgentConfig, context: ToolContext) -> Any:
         base_url=config.base_url,
         temperature=config.temperature,
     )
-    return create_agent(
-        model=model,
-        tools=create_langchain_tools(context),
-        system_prompt=build_system_prompt(),
-    )
+    tools = create_langchain_tools(context)
+    system_prompt = build_system_prompt()
+    try:
+        from langgraph.prebuilt import create_react_agent
+
+        return create_react_agent(model=model, tools=tools, prompt=system_prompt)
+    except ImportError:
+        pass
+
+    try:
+        from langchain.agents import create_agent
+    except ImportError as exc:
+        raise RuntimeError(
+            "langchain packaged agent support is required. Install "
+            "agents/langchain-react-agent/requirements.txt"
+        ) from exc
+
+    return create_agent(model=model, tools=tools, system_prompt=system_prompt)
 
 
 def run_agent(args: argparse.Namespace) -> int:
