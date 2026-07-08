@@ -72,17 +72,15 @@ class OpsBenchRunner:
 
             phases["agent"] = self._run_command(
                 "agent",
-                [
-                    str(agent),
-                    "--case-dir",
-                    str(case.case_dir),
-                    "--task",
-                    str(task_file),
-                    "--work-dir",
-                    str(workspace_dir),
-                    "--timeout-sec",
-                    str(effective_timeout),
-                ],
+                self._agent_command(
+                    case=case,
+                    agent=agent,
+                    task_file=task_file,
+                    workspace_dir=workspace_dir,
+                    trace_dir=trace_dir,
+                    timeout_sec=effective_timeout,
+                    env=env,
+                ),
                 trace_dir,
                 env,
                 timeout=effective_timeout,
@@ -155,6 +153,38 @@ class OpsBenchRunner:
             env,
             timeout=timeout,
             check=check,
+        )
+
+    def _agent_command(
+        self,
+        case: Case,
+        agent: Path,
+        task_file: Path,
+        workspace_dir: Path,
+        trace_dir: Path,
+        timeout_sec: int,
+        env: dict[str, str],
+    ) -> list[str]:
+        if not self.use_docker:
+            return [
+                str(agent),
+                "--case-dir",
+                str(case.case_dir),
+                "--task",
+                str(task_file),
+                "--work-dir",
+                str(workspace_dir),
+                "--timeout-sec",
+                str(timeout_sec),
+            ]
+        return _agent_container_cmd(
+            case=case,
+            agent=agent,
+            task_file=task_file,
+            workspace_dir=workspace_dir,
+            trace_dir=trace_dir,
+            timeout_sec=timeout_sec,
+            env=env,
         )
 
     def _run_command(
@@ -235,7 +265,9 @@ class OpsBenchRunner:
             + f"- Case id: `{case.id}`\n"
             + f"- Case directory: `{case.case_dir}`\n"
             + f"- Docker Compose file: `{case.compose_file}`\n"
-            + f"- Verify command: `{verify_cmd}`\n",
+            + f"- Primary service hostname: `{case.services[0] if case.services else 'n/a'}`\n"
+            + f"- Host verify command: `{verify_cmd}`\n"
+            + "- Docker-mode agent containers are verified by the runner after they exit.\n",
             encoding="utf-8",
         )
         return task_path
@@ -273,15 +305,16 @@ class OpsBenchRunner:
         verify_cmd: Path,
     ) -> dict[str, str]:
         env = os.environ.copy()
-        env.update(
-            {
-                "OPSBENCH_CASE_ID": case.id,
-                "OPSBENCH_RUN_ID": run_id,
-                "OPSBENCH_COMPOSE_PROJECT": compose_project,
-                "OPSBENCH_TRACE_DIR": str(trace_dir),
-                "OPSBENCH_VERIFY_CMD": str(verify_cmd),
-            }
-        )
+        phase_env = {
+            "OPSBENCH_CASE_ID": case.id,
+            "OPSBENCH_RUN_ID": run_id,
+            "OPSBENCH_COMPOSE_PROJECT": compose_project,
+            "OPSBENCH_TRACE_DIR": str(trace_dir),
+            "OPSBENCH_VERIFY_CMD": str(verify_cmd),
+        }
+        if case.services:
+            phase_env["OPSBENCH_SHELL_SERVICE"] = case.services[0]
+        env.update(phase_env)
         return env
 
 
@@ -295,6 +328,69 @@ def _compose_cmd(case: Case, compose_project: str, args: list[str]) -> list[str]
         str(case.compose_file),
         *args,
     ]
+
+
+def _agent_container_cmd(
+    case: Case,
+    agent: Path,
+    task_file: Path,
+    workspace_dir: Path,
+    trace_dir: Path,
+    timeout_sec: int,
+    env: dict[str, str],
+) -> list[str]:
+    mount_root = _agent_mount_root(case.case_dir, agent)
+    container_case_dir = _container_path(case.case_dir, mount_root)
+    container_agent = _container_path(agent, mount_root)
+    return [
+        "docker",
+        "compose",
+        "-p",
+        env["OPSBENCH_COMPOSE_PROJECT"],
+        "-f",
+        str(case.compose_file),
+        "run",
+        "--rm",
+        "--build",
+        "-T",
+        "--no-deps",
+        "-v",
+        f"{mount_root}:/workspace",
+        "-v",
+        f"{workspace_dir}:/work",
+        "-v",
+        f"{trace_dir}:/trace",
+        "-e",
+        "OPSBENCH_AGENT_CONTAINER=1",
+        "-e",
+        f"OPSBENCH_CASE_ID={env.get('OPSBENCH_CASE_ID', '')}",
+        "-e",
+        f"OPSBENCH_RUN_ID={env.get('OPSBENCH_RUN_ID', '')}",
+        "-e",
+        "OPSBENCH_TRACE_DIR=/trace",
+        "-e",
+        "OPSBENCH_VERIFY_CMD=",
+        "-e",
+        f"OPSBENCH_SHELL_SERVICE={case.services[0] if case.services else ''}",
+        "agent-runner",
+        container_agent,
+        "--case-dir",
+        container_case_dir,
+        "--task",
+        "/work/task.md",
+        "--work-dir",
+        "/work",
+        "--timeout-sec",
+        str(timeout_sec),
+    ]
+
+
+def _agent_mount_root(case_dir: Path, agent: Path) -> Path:
+    return Path(os.path.commonpath([str(case_dir.resolve()), str(agent.resolve())]))
+
+
+def _container_path(path: Path, mount_root: Path) -> str:
+    return "/workspace/" + path.resolve().relative_to(mount_root).as_posix()
 
 
 def _parse_last_json_object(output: str) -> dict[str, Any]:

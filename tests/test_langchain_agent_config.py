@@ -14,7 +14,7 @@ class LangChainAgentConfigTests(unittest.TestCase):
         self.assertEqual(config.api_key, "secret")
         self.assertEqual(config.base_url, "https://api.deepseek.com")
         self.assertEqual(config.model, "deepseek-v4-pro")
-        self.assertEqual(config.max_steps, 12)
+        self.assertEqual(config.max_steps, 30)
         self.assertEqual(config.temperature, 0.0)
 
     def test_load_config_allows_overrides(self):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from common import emit, psql, wait_for_db
+from common import emit, psql_with_retries, wait_for_db
 
 
 def main() -> int:
@@ -13,7 +13,7 @@ def main() -> int:
     case_dir = Path(args.case_dir)
 
     wait_for_db(case_dir)
-    result = psql(
+    result = psql_with_retries(
         case_dir,
         (
             "SELECT count(*) FROM pg_indexes "

@@ -58,21 +58,21 @@ def build_agent(config: AgentConfig, context: ToolContext) -> Any:
     tools = create_langchain_tools(context)
     system_prompt = build_system_prompt()
     try:
-        from langgraph.prebuilt import create_react_agent
+        from langchain.agents import create_agent
 
-        return create_react_agent(model=model, tools=tools, prompt=system_prompt)
+        return create_agent(model=model, tools=tools, system_prompt=system_prompt)
     except ImportError:
         pass
 
     try:
-        from langchain.agents import create_agent
+        from langgraph.prebuilt import create_react_agent
     except ImportError as exc:
         raise RuntimeError(
             "langchain packaged agent support is required. Install "
             "agents/langchain-react-agent/requirements.txt"
         ) from exc
 
-    return create_agent(model=model, tools=tools, system_prompt=system_prompt)
+    return create_react_agent(model=model, tools=tools, prompt=system_prompt)
 
 
 def run_agent(args: argparse.Namespace) -> int:
@@ -100,6 +100,7 @@ def run_agent(args: argparse.Namespace) -> int:
         task_text=task_text,
         case_dir=str(case_dir),
         work_dir=str(work_dir),
+        shell_service=os.environ.get("OPSBENCH_SHELL_SERVICE", ""),
         verify_cmd=context.verify_cmd,
     )
 
@@ -109,6 +110,7 @@ def run_agent(args: argparse.Namespace) -> int:
             {"messages": [{"role": "user", "content": user_prompt}]},
             config={"recursion_limit": config.max_steps},
         )
+        _write_react_trace(trace_dir, response)
         final_response = _extract_final_response(response)
     except Exception as exc:  # noqa: BLE001 - agent failure is recorded for benchmark traces.
         _write_trace(trace_dir, config, "failed", str(exc))
@@ -152,6 +154,160 @@ def _extract_final_response(response: Any) -> str:
             content = last_message.get("content")
         return str(content)
     return str(response)
+
+
+def _write_react_trace(trace_dir: Path, response: Any) -> None:
+    messages = _extract_response_messages(response)
+    serialized_messages = [
+        _serialize_message(index, message)
+        for index, message in enumerate(messages, start=1)
+    ]
+    (trace_dir / "react-trace.json").write_text(
+        json.dumps({"messages": serialized_messages}, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    (trace_dir / "react-trace.md").write_text(
+        _format_react_trace_markdown(serialized_messages),
+        encoding="utf-8",
+    )
+
+
+def _extract_response_messages(response: Any) -> list[Any]:
+    if isinstance(response, dict):
+        messages = response.get("messages", [])
+        if isinstance(messages, list):
+            return messages
+    return []
+
+
+def _serialize_message(index: int, message: Any) -> dict[str, Any]:
+    role = _message_value(message, "role") or _message_value(message, "type") or "message"
+    serialized: dict[str, Any] = {
+        "index": index,
+        "role": _normalize_role(str(role)),
+        "content": _json_safe(_message_value(message, "content") or ""),
+        "actions": _extract_actions(message),
+    }
+    name = _message_value(message, "name")
+    if name:
+        serialized["name"] = str(name)
+    tool_call_id = _message_value(message, "tool_call_id")
+    if tool_call_id:
+        serialized["tool_call_id"] = str(tool_call_id)
+    return serialized
+
+
+def _message_value(message: Any, key: str) -> Any:
+    if isinstance(message, dict):
+        return message.get(key)
+    return getattr(message, key, None)
+
+
+def _normalize_role(role: str) -> str:
+    lowered = role.lower()
+    if lowered in {"human", "user"}:
+        return "user"
+    if lowered in {"ai", "assistant"}:
+        return "assistant"
+    if lowered in {"tool", "function"}:
+        return "tool"
+    return lowered
+
+
+def _extract_actions(message: Any) -> list[dict[str, Any]]:
+    raw_tool_calls = _message_value(message, "tool_calls") or []
+    additional_kwargs = _message_value(message, "additional_kwargs") or {}
+    if not raw_tool_calls and isinstance(additional_kwargs, dict):
+        raw_tool_calls = additional_kwargs.get("tool_calls") or []
+    if not isinstance(raw_tool_calls, list):
+        return []
+    return [_serialize_tool_call(tool_call) for tool_call in raw_tool_calls]
+
+
+def _serialize_tool_call(tool_call: Any) -> dict[str, Any]:
+    if isinstance(tool_call, dict):
+        function = tool_call.get("function") or {}
+        raw_args = tool_call.get("args")
+        if raw_args is None and isinstance(function, dict):
+            raw_args = function.get("arguments")
+        return {
+            "id": _string_or_empty(tool_call.get("id")),
+            "name": _string_or_empty(tool_call.get("name") or function.get("name")),
+            "args": _parse_tool_args(raw_args),
+        }
+    function = getattr(tool_call, "function", None)
+    raw_args = getattr(tool_call, "args", None)
+    if raw_args is None and function is not None:
+        raw_args = getattr(function, "arguments", None)
+    return {
+        "id": _string_or_empty(getattr(tool_call, "id", "")),
+        "name": _string_or_empty(
+            getattr(tool_call, "name", "") or getattr(function, "name", "")
+        ),
+        "args": _parse_tool_args(raw_args),
+    }
+
+
+def _parse_tool_args(raw_args: Any) -> Any:
+    if isinstance(raw_args, str):
+        try:
+            return json.loads(raw_args)
+        except json.JSONDecodeError:
+            return raw_args
+    return _json_safe(raw_args)
+
+
+def _json_safe(value: Any) -> Any:
+    try:
+        json.dumps(value)
+    except TypeError:
+        return str(value)
+    return value
+
+
+def _string_or_empty(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value)
+
+
+def _format_react_trace_markdown(messages: list[dict[str, Any]]) -> str:
+    lines = ["# LangChain ReAct Trace", ""]
+    for message in messages:
+        role = message["role"]
+        heading = {
+            "user": "User",
+            "assistant": "Assistant",
+            "tool": "Observation",
+        }.get(role, role.title())
+        lines.extend([f"## {message['index']}. {heading}", ""])
+        name = message.get("name")
+        if name:
+            lines.extend([f"- Name: `{name}`", ""])
+        tool_call_id = message.get("tool_call_id")
+        if tool_call_id:
+            lines.extend([f"- Tool call id: `{tool_call_id}`", ""])
+        content = _markdown_content(message["content"])
+        if content:
+            lines.extend([content, ""])
+        for action_index, action in enumerate(message["actions"], start=1):
+            lines.extend(
+                [
+                    f"### Action {action_index}",
+                    "",
+                    f"- Tool: `{action['name']}`",
+                ]
+            )
+            if action["id"]:
+                lines.append(f"- Call id: `{action['id']}`")
+            lines.extend(["", "```json", json.dumps(action["args"], indent=2), "```", ""])
+    return "\n".join(lines)
+
+
+def _markdown_content(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+    return "```json\n" + json.dumps(content, indent=2) + "\n```"
 
 
 def _write_trace(

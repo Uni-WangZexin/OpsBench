@@ -43,6 +43,8 @@ class RunnerTests(unittest.TestCase):
             )
             trace_dir = root / record["trace_dir"]
             self.assertTrue((trace_dir / "agent-trace.md").exists())
+            trace = (trace_dir / "agent-trace.md").read_text(encoding="utf-8")
+            self.assertIn("Shell service: db", trace)
             self.assertTrue((trace_dir / "agent-verify.json").exists())
             self.assertTrue((results_dir / "runs.jsonl").exists())
 
@@ -81,6 +83,56 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(record["score"], 0.0)
             recorded = json.loads((results_dir / "runs.jsonl").read_text(encoding="utf-8"))
             self.assertEqual(recorded["run_id"], record["run_id"])
+
+    def test_docker_runner_executes_agent_inside_agent_runner_container(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            case_dir = self._write_fake_case(root)
+            agent_path = self._write_fake_agent(root)
+            results_dir = root / "results"
+            runner = _RecordingDockerRunner()
+
+            record = runner.run(
+                case_dir=case_dir,
+                agent_path=agent_path,
+                results_dir=results_dir,
+                timeout_sec=20,
+            )
+
+            self.assertTrue(record["verification_passed"])
+            agent_command = runner.commands["agent"]
+            trace_dir = root / record["trace_dir"]
+            workspace_dir = Path("runtime") / record["run_id"] / "workspace"
+            workspace_dir = workspace_dir.resolve()
+            self.assertEqual(agent_command[0:5], ["docker", "compose", "-p", runner.compose_project, "-f"])
+            self.assertEqual(agent_command[5], str(case_dir.resolve() / "docker-compose.yaml"))
+            self.assertIn("run", agent_command)
+            self.assertIn("--rm", agent_command)
+            self.assertIn("--build", agent_command)
+            self.assertIn("-T", agent_command)
+            self.assertIn("agent-runner", agent_command)
+            self.assertIn(f"{root.resolve()}:/workspace", agent_command)
+            self.assertIn(f"{workspace_dir}:/work", agent_command)
+            self.assertIn(f"{trace_dir.resolve()}:/trace", agent_command)
+            self.assertIn("OPSBENCH_AGENT_CONTAINER=1", agent_command)
+            self.assertIn("OPSBENCH_TRACE_DIR=/trace", agent_command)
+            self.assertIn("OPSBENCH_VERIFY_CMD=", agent_command)
+
+            service_index = agent_command.index("agent-runner")
+            self.assertEqual(
+                agent_command[service_index + 1 : service_index + 10],
+                [
+                    "/workspace/agents/fake-agent/run.sh",
+                    "--case-dir",
+                    "/workspace/cases/fake-case",
+                    "--task",
+                    "/work/task.md",
+                    "--work-dir",
+                    "/work",
+                    "--timeout-sec",
+                    "20",
+                ],
+            )
 
     def _write_fake_case(self, root: Path, verify_passed: bool = True) -> Path:
         case_dir = root / "cases" / "fake-case"
@@ -208,7 +260,10 @@ class RunnerTests(unittest.TestCase):
 
                 mkdir -p "$OPSBENCH_TRACE_DIR"
                 test -f "$task_file"
-                echo "fake agent read task" > "$OPSBENCH_TRACE_DIR/agent-trace.md"
+                {
+                  echo "fake agent read task"
+                  echo "Shell service: ${OPSBENCH_SHELL_SERVICE:-}"
+                } > "$OPSBENCH_TRACE_DIR/agent-trace.md"
                 "$OPSBENCH_VERIFY_CMD" > "$OPSBENCH_TRACE_DIR/agent-verify.json"
                 """
             ),
@@ -216,6 +271,38 @@ class RunnerTests(unittest.TestCase):
         )
         run_sh.chmod(run_sh.stat().st_mode | stat.S_IXUSR)
         return run_sh
+
+
+class _RecordingDockerRunner(OpsBenchRunner):
+    def __init__(self):
+        super().__init__(use_docker=True)
+        self.commands = {}
+        self.compose_project = ""
+
+    def _run_command(
+        self,
+        phase,
+        command,
+        trace_dir,
+        env,
+        timeout,
+        check=True,
+    ):
+        self.commands[phase] = command
+        self.compose_project = env["OPSBENCH_COMPOSE_PROJECT"]
+        stdout = ""
+        if phase == "verify":
+            stdout = json.dumps({"passed": True, "checks": []})
+        result = {
+            "phase": phase,
+            "command": command,
+            "returncode": 0,
+            "stdout": stdout,
+            "stderr": "",
+            "duration_sec": 0.001,
+        }
+        self._write_phase_log(trace_dir, phase, result)
+        return result
 
 
 if __name__ == "__main__":

@@ -87,11 +87,16 @@ def psql_with_retries(
 def wait_for_db(case_dir: Path, timeout: int = 60) -> None:
     deadline = time.monotonic() + timeout
     last_error = ""
+    consecutive_successes = 0
     while time.monotonic() < deadline:
         result = psql(case_dir, "SELECT 1;", timeout=10)
         if result.returncode == 0 and result.stdout.strip() == "1":
-            return
-        last_error = result.stderr.strip() or result.stdout.strip()
+            consecutive_successes += 1
+            if consecutive_successes >= 2:
+                return
+        else:
+            consecutive_successes = 0
+            last_error = result.stderr.strip() or result.stdout.strip()
         time.sleep(1)
     raise RuntimeError(f"database did not become ready: {last_error}")
 

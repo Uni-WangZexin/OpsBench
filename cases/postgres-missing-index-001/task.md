@@ -11,7 +11,13 @@ You may change the database, service files, configuration, or scripts inside thi
 - Database user: `opsbench`
 - Database password: `opsbench`
 - Docker Compose is managed by the runner with `OPSBENCH_COMPOSE_PROJECT`.
-- You can inspect PostgreSQL with:
+- If your agent is running inside the agent-runner container, inspect PostgreSQL with:
+
+```bash
+psql -h db -U opsbench -d opsbench
+```
+
+- If you are running manually from the host, inspect PostgreSQL with:
 
 ```bash
 docker compose -p "$OPSBENCH_COMPOSE_PROJECT" -f docker-compose.yaml exec -T db \

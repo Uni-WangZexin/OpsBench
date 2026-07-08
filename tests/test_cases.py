@@ -61,6 +61,18 @@ class LoadCaseTests(unittest.TestCase):
             with self.assertRaisesRegex(CaseManifestError, "domain"):
                 load_case(case_dir)
 
+    def test_postgres_case_initialization_creates_missing_index_once(self):
+        root = Path(__file__).resolve().parents[1]
+        db_dir = root / "cases" / "postgres-missing-index-001" / "db"
+        init_sql = "\n".join(
+            [
+                (db_dir / "schema.sql").read_text(encoding="utf-8"),
+                (db_dir / "seed.sql").read_text(encoding="utf-8"),
+            ]
+        ).upper()
+
+        self.assertEqual(init_sql.count("IDX_ORDERS_CUSTOMER_ID"), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -10,18 +10,23 @@ class LangChainAgentPromptTests(unittest.TestCase):
         self.assertIn("OpsBench", prompt)
         self.assertIn("Do not inspect hidden", prompt)
         self.assertIn("run the verifier", prompt)
+        self.assertIn("psql_query", prompt)
+        self.assertIn("psql_execute", prompt)
+        self.assertIn("write_file only", prompt)
 
     def test_user_prompt_contains_public_context(self):
         prompt = build_user_prompt(
             task_text="The API is slow.",
             case_dir="/case",
             work_dir="/work",
+            shell_service="db",
             verify_cmd="/work/verify.sh",
         )
 
         self.assertIn("The API is slow.", prompt)
         self.assertIn("/case", prompt)
         self.assertIn("/work", prompt)
+        self.assertIn("db", prompt)
         self.assertIn("/work/verify.sh", prompt)
         self.assertNotIn("oracle_fix.sql", prompt)
 

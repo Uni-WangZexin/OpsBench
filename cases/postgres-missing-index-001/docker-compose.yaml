@@ -13,3 +13,25 @@ services:
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+
+  agent-runner:
+    profiles: ["agent"]
+    build:
+      context: ../..
+      dockerfile: agents/langchain-react-agent/Dockerfile
+    working_dir: /workspace
+    environment:
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-v4-pro}
+      LANGCHAIN_MAX_STEPS: ${LANGCHAIN_MAX_STEPS:-30}
+      LANGCHAIN_TEMPERATURE: ${LANGCHAIN_TEMPERATURE:-0}
+      PGHOST: db
+      PGDATABASE: opsbench
+      PGUSER: opsbench
+      PGPASSWORD: opsbench
+    volumes:
+      - ../..:/workspace
+    depends_on:
+      db:
+        condition: service_healthy

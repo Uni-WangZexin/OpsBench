@@ -13,14 +13,14 @@ class ResultsTests(unittest.TestCase):
             first = {
                 "run_id": "run-1",
                 "case_id": "postgres-missing-index-001",
-                "agent": "noop-agent",
+                "agent": "agent-a",
                 "duration_sec": 3.5,
                 "verification_passed": False,
             }
             second = {
                 "run_id": "run-2",
                 "case_id": "postgres-missing-index-001",
-                "agent": "oracle-agent",
+                "agent": "agent-b",
                 "duration_sec": 4.5,
                 "verification_passed": True,
             }
@@ -33,17 +33,17 @@ class ResultsTests(unittest.TestCase):
     def test_summarizes_runs_by_agent(self):
         runs = [
             {
-                "agent": "noop-agent",
+                "agent": "agent-a",
                 "duration_sec": 5.0,
                 "verification_passed": False,
             },
             {
-                "agent": "oracle-agent",
+                "agent": "agent-b",
                 "duration_sec": 4.0,
                 "verification_passed": True,
             },
             {
-                "agent": "oracle-agent",
+                "agent": "agent-b",
                 "duration_sec": 6.0,
                 "verification_passed": True,
             },
@@ -51,19 +51,19 @@ class ResultsTests(unittest.TestCase):
 
         summary = summarize_runs(runs)
 
-        self.assertEqual(summary["noop-agent"]["runs"], 1)
-        self.assertEqual(summary["noop-agent"]["passes"], 0)
-        self.assertEqual(summary["noop-agent"]["pass_rate"], 0.0)
-        self.assertEqual(summary["noop-agent"]["average_duration_sec"], 5.0)
-        self.assertEqual(summary["oracle-agent"]["runs"], 2)
-        self.assertEqual(summary["oracle-agent"]["passes"], 2)
-        self.assertEqual(summary["oracle-agent"]["pass_rate"], 1.0)
-        self.assertEqual(summary["oracle-agent"]["average_duration_sec"], 5.0)
+        self.assertEqual(summary["agent-a"]["runs"], 1)
+        self.assertEqual(summary["agent-a"]["passes"], 0)
+        self.assertEqual(summary["agent-a"]["pass_rate"], 0.0)
+        self.assertEqual(summary["agent-a"]["average_duration_sec"], 5.0)
+        self.assertEqual(summary["agent-b"]["runs"], 2)
+        self.assertEqual(summary["agent-b"]["passes"], 2)
+        self.assertEqual(summary["agent-b"]["pass_rate"], 1.0)
+        self.assertEqual(summary["agent-b"]["average_duration_sec"], 5.0)
 
     def test_formats_leaderboard_table(self):
         table = format_leaderboard(
             {
-                "oracle-agent": {
+                "agent-b": {
                     "runs": 2,
                     "passes": 2,
                     "pass_rate": 1.0,
@@ -73,7 +73,7 @@ class ResultsTests(unittest.TestCase):
         )
 
         self.assertIn("agent", table)
-        self.assertIn("oracle-agent", table)
+        self.assertIn("agent-b", table)
         self.assertIn("100.0%", table)
 
 
