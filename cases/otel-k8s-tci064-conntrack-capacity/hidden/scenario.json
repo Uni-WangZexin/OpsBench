@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci064-conntrack-capacity",
+  "tc": "TCI064",
+  "component": "frontend-proxy",
+  "resource": "Pod/frontend-proxy",
+  "simulated_kind": "Pod",
+  "severity": "critical",
+  "symptom": "CCE网络时延增大：OpenTelemetry Demo 服务状态异常",
+  "signal": "Pod/frontend-proxy reports conntrack_capacity=exhausted",
+  "state": {
+    "field": "conntrack_capacity",
+    "healthy": "available",
+    "faulty": "exhausted"
+  }
+}

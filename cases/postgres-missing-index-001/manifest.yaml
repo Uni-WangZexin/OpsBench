@@ -12,6 +12,11 @@
   },
   "task": "task.md",
   "hidden_metadata": "hidden/labels.yaml",
+  "tool_standard": {
+    "id": "postgres-ops-v1",
+    "tools": ["shell"],
+    "commands": ["psql"]
+  },
   "timeouts": {
     "agent_sec": 300
   },

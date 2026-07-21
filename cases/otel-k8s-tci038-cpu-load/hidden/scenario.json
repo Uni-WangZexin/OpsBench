@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci038-cpu-load",
+  "tc": "TCI038",
+  "component": "frontend",
+  "resource": "Deployment/frontend",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/frontend reports cpu_load=saturated",
+  "state": {
+    "field": "cpu_load",
+    "healthy": "normal",
+    "faulty": "saturated"
+  }
+}

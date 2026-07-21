@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI059",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "nfs_endpoint",
+  "root_cause": "NFS异常",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:PersistentVolume"
+}

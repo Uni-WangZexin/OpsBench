@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI045",
+  "scene": "事件",
+  "subscene": "CCE工作负载运行异常",
+  "fault_type": "node_network",
+  "root_cause": "网络异常",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

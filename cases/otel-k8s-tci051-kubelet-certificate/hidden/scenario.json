@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci051-kubelet-certificate",
+  "tc": "TCI051",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "Certificate",
+  "severity": "warning",
+  "symptom": "CCE Node节点状态异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports kubelet_certificate=expired",
+  "state": {
+    "field": "kubelet_certificate",
+    "healthy": "valid",
+    "faulty": "expired"
+  }
+}

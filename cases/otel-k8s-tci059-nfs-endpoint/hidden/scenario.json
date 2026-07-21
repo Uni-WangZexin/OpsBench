@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci059-nfs-endpoint",
+  "tc": "TCI059",
+  "component": "accounting",
+  "resource": "PersistentVolume/accounting",
+  "simulated_kind": "PersistentVolume",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "PersistentVolume/accounting reports nfs_endpoint=unavailable",
+  "state": {
+    "field": "nfs_endpoint",
+    "healthy": "available",
+    "faulty": "unavailable"
+  }
+}

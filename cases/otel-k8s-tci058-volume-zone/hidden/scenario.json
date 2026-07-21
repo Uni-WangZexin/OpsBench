@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci058-volume-zone",
+  "tc": "TCI058",
+  "component": "checkout",
+  "resource": "PersistentVolume/checkout",
+  "simulated_kind": "PersistentVolume",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "PersistentVolume/checkout reports volume_zone=cross-zone",
+  "state": {
+    "field": "volume_zone",
+    "healthy": "same-zone",
+    "faulty": "cross-zone"
+  }
+}

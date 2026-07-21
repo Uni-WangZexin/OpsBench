@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI090",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "ssl_redirect",
+  "root_cause": "配置冲突的Annotations",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Ingress"
+}

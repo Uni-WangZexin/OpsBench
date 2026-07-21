@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci072-session-affinity",
+  "tc": "TCI072",
+  "component": "frontend",
+  "resource": "Ingress/frontend",
+  "simulated_kind": "Ingress",
+  "severity": "warning",
+  "symptom": "CCE Nginx-Ingress访问异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Ingress/frontend reports session_affinity=none",
+  "state": {
+    "field": "session_affinity",
+    "healthy": "cookie",
+    "faulty": "none"
+  }
+}

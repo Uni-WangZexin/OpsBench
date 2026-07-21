@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI061",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "image_reference",
+  "root_cause": "镜像错误",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

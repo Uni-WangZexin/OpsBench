@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci069-network-acl",
+  "tc": "TCI069",
+  "component": "network-acl",
+  "resource": "ConfigMap/network-acl",
+  "simulated_kind": "CloudNetworkACL",
+  "severity": "warning",
+  "symptom": "CCE网络不通：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/network-acl reports network_acl=deny",
+  "state": {
+    "field": "network_acl",
+    "healthy": "allow",
+    "faulty": "deny"
+  }
+}

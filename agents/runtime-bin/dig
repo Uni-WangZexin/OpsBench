@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import socket
+import sys
+
+
+def main() -> int:
+    names = [arg for arg in sys.argv[1:] if not arg.startswith(("+", "@", "-"))]
+    if not names:
+        print("dig shim: hostname is required", file=sys.stderr)
+        return 2
+    try:
+        addresses = sorted({item[4][0] for item in socket.getaddrinfo(names[0], None)})
+    except socket.gaierror as exc:
+        print(f"dig shim: {exc}", file=sys.stderr)
+        return 1
+    print("\n".join(addresses))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

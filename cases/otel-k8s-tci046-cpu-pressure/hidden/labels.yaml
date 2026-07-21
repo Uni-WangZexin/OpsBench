@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI046",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "cpu_pressure",
+  "root_cause": "CPU过载",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

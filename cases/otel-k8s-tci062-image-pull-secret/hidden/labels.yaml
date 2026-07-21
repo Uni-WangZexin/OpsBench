@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI062",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "image_pull_secret",
+  "root_cause": "密钥错误",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Secret"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci045-node-network",
+  "tc": "TCI045",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "Node",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports node_network=unreachable",
+  "state": {
+    "field": "node_network",
+    "healthy": "reachable",
+    "faulty": "unreachable"
+  }
+}

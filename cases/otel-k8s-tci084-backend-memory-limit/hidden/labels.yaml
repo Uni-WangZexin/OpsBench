@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI084",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "backend_memory_limit",
+  "root_cause": "注入Pod资源超限",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

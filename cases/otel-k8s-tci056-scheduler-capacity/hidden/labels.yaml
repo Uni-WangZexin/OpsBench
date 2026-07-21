@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI056",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "scheduler_capacity",
+  "root_cause": "资源不足",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Pod"
+}

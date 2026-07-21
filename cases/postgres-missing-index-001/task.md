@@ -2,7 +2,7 @@
 
 The order history workload for a PostgreSQL-backed service is slower than expected. Your goal is to diagnose and repair the environment so the final verifier passes.
 
-You may change the database, service files, configuration, or scripts inside this case environment. The benchmark will judge the final behavior, not a specific patch.
+Diagnose the live database and apply the smallest database repair needed. The benchmark will judge the final service behavior, not a specific SQL statement.
 
 ## Useful Context
 
@@ -10,18 +10,11 @@ You may change the database, service files, configuration, or scripts inside thi
 - Database name: `opsbench`
 - Database user: `opsbench`
 - Database password: `opsbench`
-- Docker Compose is managed by the runner with `OPSBENCH_COMPOSE_PROJECT`.
-- If your agent is running inside the agent-runner container, inspect PostgreSQL with:
+- The agent runs in an isolated container on the same network as the database.
+- Inspect and repair PostgreSQL from that container with:
 
 ```bash
 psql -h db -U opsbench -d opsbench
-```
-
-- If you are running manually from the host, inspect PostgreSQL with:
-
-```bash
-docker compose -p "$OPSBENCH_COMPOSE_PROJECT" -f docker-compose.yaml exec -T db \
-  psql -U opsbench -d opsbench
 ```
 
 ## Success Criteria

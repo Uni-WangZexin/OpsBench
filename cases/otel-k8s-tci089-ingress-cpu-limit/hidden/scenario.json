@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci089-ingress-cpu-limit",
+  "tc": "TCI089",
+  "component": "ingress-controller",
+  "resource": "Deployment/ingress-controller",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/ingress-controller reports ingress_cpu_limit=100m",
+  "state": {
+    "field": "ingress_cpu_limit",
+    "healthy": "500m",
+    "faulty": "100m"
+  }
+}

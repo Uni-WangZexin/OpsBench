@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI043",
+  "scene": "事件",
+  "subscene": "CCE工作负载运行异常",
+  "fault_type": "pod_connectivity",
+  "root_cause": "网络隔离",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:NetworkPolicy"
+}

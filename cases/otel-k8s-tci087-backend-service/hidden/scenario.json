@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci087-backend-service",
+  "tc": "TCI087",
+  "component": "checkout",
+  "resource": "Service/checkout",
+  "simulated_kind": "Service",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/checkout reports backend_service=deleted",
+  "state": {
+    "field": "backend_service",
+    "healthy": "present",
+    "faulty": "deleted"
+  }
+}

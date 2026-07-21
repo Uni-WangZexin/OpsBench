@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI053",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "root_filesystem",
+  "root_cause": "强制挂载为只读",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

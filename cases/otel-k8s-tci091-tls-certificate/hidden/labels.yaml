@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI091",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "tls_certificate",
+  "root_cause": "过期证书不轮换",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Secret"
+}

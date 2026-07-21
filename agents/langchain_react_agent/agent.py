@@ -35,7 +35,6 @@ def write_missing_key_error(trace_dir: Path, exc: Exception) -> None:
             "agent": "langchain-react-agent",
             "status": "configuration_error",
             "error": message,
-            "verifier_called": False,
         },
     )
 
@@ -76,7 +75,6 @@ def build_agent(config: AgentConfig, context: ToolContext) -> Any:
 
 
 def run_agent(args: argparse.Namespace) -> int:
-    case_dir = Path(args.case_dir).resolve()
     task_file = Path(args.task).resolve()
     work_dir = Path(args.work_dir).resolve()
     trace_dir = Path(os.environ.get("OPSBENCH_TRACE_DIR", work_dir / "trace")).resolve()
@@ -89,19 +87,19 @@ def run_agent(args: argparse.Namespace) -> int:
         return 2
 
     context = ToolContext(
-        case_dir=case_dir,
-        work_dir=work_dir,
+        execution_dir=Path.cwd(),
         trace_dir=trace_dir,
-        verify_cmd=os.environ.get("OPSBENCH_VERIFY_CMD", ""),
         command_timeout_sec=min(max(args.timeout_sec, 1), 120),
+        tool_standard=os.environ.get("OPSBENCH_TOOL_STANDARD", "shell-v1"),
+        namespace=os.environ.get("OPSBENCH_NAMESPACE", ""),
     )
     task_text = task_file.read_text(encoding="utf-8")
     user_prompt = build_user_prompt(
         task_text=task_text,
-        case_dir=str(case_dir),
-        work_dir=str(work_dir),
         shell_service=os.environ.get("OPSBENCH_SHELL_SERVICE", ""),
-        verify_cmd=context.verify_cmd,
+        namespace=os.environ.get("OPSBENCH_NAMESPACE", ""),
+        tool_standard=os.environ.get("OPSBENCH_TOOL_STANDARD", "shell-v1"),
+        tool_commands=os.environ.get("OPSBENCH_TOOL_COMMANDS", ""),
     )
 
     try:
@@ -122,7 +120,6 @@ def run_agent(args: argparse.Namespace) -> int:
                 "base_url": config.base_url,
                 "status": "failed",
                 "error": str(exc),
-                "verifier_called": context.verifier_called,
             },
         )
         return 1
@@ -136,7 +133,6 @@ def run_agent(args: argparse.Namespace) -> int:
             "base_url": config.base_url,
             "status": "completed",
             "final_response": final_response,
-            "verifier_called": context.verifier_called,
         },
     )
     return 0

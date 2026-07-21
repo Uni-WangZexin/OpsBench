@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci077-coredns-kubernetes-plugin",
+  "tc": "TCI077",
+  "component": "coredns",
+  "resource": "ConfigMap/coredns",
+  "simulated_kind": "ConfigMap",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/coredns reports coredns_kubernetes_plugin=removed",
+  "state": {
+    "field": "coredns_kubernetes_plugin",
+    "healthy": "enabled",
+    "faulty": "removed"
+  }
+}

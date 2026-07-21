@@ -143,10 +143,8 @@ class LangChainAgentEntrypointTests(unittest.TestCase):
                         temperature=0.0,
                     ),
                     ToolContext(
-                        case_dir=case_dir,
-                        work_dir=work_dir,
+                        execution_dir=case_dir,
                         trace_dir=trace_dir,
-                        verify_cmd="/bin/true",
                     ),
                 )
 

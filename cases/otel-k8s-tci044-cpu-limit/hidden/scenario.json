@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci044-cpu-limit",
+  "tc": "TCI044",
+  "component": "product-catalog",
+  "resource": "Deployment/product-catalog",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/product-catalog reports cpu_limit=100m",
+  "state": {
+    "field": "cpu_limit",
+    "healthy": "500m",
+    "faulty": "100m"
+  }
+}

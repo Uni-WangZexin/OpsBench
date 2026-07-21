@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI076",
+  "scene": "事件",
+  "subscene": "CCE Nginx-Ingress访问异常",
+  "fault_type": "controller_image",
+  "root_cause": "创建的nginx状态非正常",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

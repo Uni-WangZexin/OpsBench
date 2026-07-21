@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI068",
+  "scene": "事件",
+  "subscene": "CCE网络不通",
+  "fault_type": "security_group_port_80",
+  "root_cause": "修改安全组规则（模拟误操作）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:CloudSecurityGroup"
+}

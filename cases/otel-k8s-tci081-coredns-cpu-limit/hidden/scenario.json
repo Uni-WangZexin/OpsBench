@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci081-coredns-cpu-limit",
+  "tc": "TCI081",
+  "component": "coredns",
+  "resource": "Deployment/coredns",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/coredns reports coredns_cpu_limit=50m",
+  "state": {
+    "field": "coredns_cpu_limit",
+    "healthy": "200m",
+    "faulty": "50m"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "otel-k8s-tci073-service-selector",
+  "domain": "kubernetes",
+  "environment": {
+    "type": "kubernetes",
+    "compose_file": "docker-compose.yaml",
+    "services": [],
+    "namespace_prefix": "ops-tci073",
+    "baseline": {
+      "distribution": "kubernetes-1.24+",
+      "helm_chart": "open-telemetry/opentelemetry-demo",
+      "chart_version": "0.11.0",
+      "memory_requirement": "6Gi"
+    }
+  },
+  "scripts": {
+    "setup": "scripts/setup.py",
+    "inject": "scripts/inject.py",
+    "check_injected": "scripts/check_injected.py",
+    "verify": "scripts/verify.py",
+    "cleanup": "scripts/cleanup.py"
+  },
+  "task": "task.md",
+  "hidden_metadata": "hidden/labels.yaml",
+  "tool_standard": {
+    "id": "kubernetes-observability-v1",
+    "tools": [
+      "shell",
+      "kubectl_logs",
+      "list_metrics",
+      "query_metrics",
+      "search_traces",
+      "get_trace",
+      "query_logs"
+    ],
+    "commands": [
+      "kubectl",
+      "helm",
+      "curl",
+      "jq"
+    ]
+  },
+  "timeouts": {
+    "agent_sec": 420
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI055",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "ip_forward",
+  "root_cause": "ip_forward=0",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Sysctl"
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI073",
+  "scene": "事件",
+  "subscene": "CCE Nginx-Ingress访问异常",
+  "fault_type": "service_selector",
+  "root_cause": "删除后端Service的Selector标签",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Service"
+}

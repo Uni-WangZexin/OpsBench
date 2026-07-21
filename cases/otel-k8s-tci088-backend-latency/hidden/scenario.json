@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci088-backend-latency",
+  "tc": "TCI088",
+  "component": "checkout",
+  "resource": "Pod/checkout",
+  "simulated_kind": "Pod",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Pod/checkout reports backend_latency=500ms",
+  "state": {
+    "field": "backend_latency",
+    "healthy": "0ms",
+    "faulty": "500ms"
+  }
+}

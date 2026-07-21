@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci046-cpu-pressure",
+  "tc": "TCI046",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "Node",
+  "severity": "warning",
+  "symptom": "CCE Node节点状态异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports cpu_pressure=true",
+  "state": {
+    "field": "cpu_pressure",
+    "healthy": "false",
+    "faulty": "true"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI083",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "backend_replicas",
+  "root_cause": "模拟后端服务不可用",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci071-controller-config",
+  "tc": "TCI071",
+  "component": "ingress-nginx-controller",
+  "resource": "ConfigMap/ingress-nginx-controller",
+  "simulated_kind": "ConfigMap",
+  "severity": "warning",
+  "symptom": "CCE Nginx-Ingress访问异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/ingress-nginx-controller reports controller_config=invalid",
+  "state": {
+    "field": "controller_config",
+    "healthy": "valid",
+    "faulty": "invalid"
+  }
+}

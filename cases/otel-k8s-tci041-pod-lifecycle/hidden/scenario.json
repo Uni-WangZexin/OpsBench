@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci041-pod-lifecycle",
+  "tc": "TCI041",
+  "component": "checkout",
+  "resource": "Pod/checkout",
+  "simulated_kind": "Pod",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Pod/checkout reports pod_lifecycle=forced-restart",
+  "state": {
+    "field": "pod_lifecycle",
+    "healthy": "stable",
+    "faulty": "forced-restart"
+  }
+}

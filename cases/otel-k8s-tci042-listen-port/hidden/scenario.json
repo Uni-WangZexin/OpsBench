@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci042-listen-port",
+  "tc": "TCI042",
+  "component": "frontend-proxy",
+  "resource": "Deployment/frontend-proxy",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/frontend-proxy reports listen_port=closed",
+  "state": {
+    "field": "listen_port",
+    "healthy": "8080",
+    "faulty": "closed"
+  }
+}

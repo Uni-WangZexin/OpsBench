@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci084-backend-memory-limit",
+  "tc": "TCI084",
+  "component": "checkout",
+  "resource": "Deployment/checkout",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/checkout reports backend_memory_limit=10Mi",
+  "state": {
+    "field": "backend_memory_limit",
+    "healthy": "256Mi",
+    "faulty": "10Mi"
+  }
+}

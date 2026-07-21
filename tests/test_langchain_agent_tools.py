@@ -1,4 +1,4 @@
-import os
+import json
 import subprocess
 import sys
 import tempfile
@@ -7,194 +7,166 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from agents.langchain_react_agent.tools import ToolContext, create_langchain_tools, create_tools
+from agents.langchain_react_agent.tools import ToolContext, create_langchain_tools
+from opsbench.agent_tools import (
+    KUBERNETES_OBSERVABILITY_TOOL_NAMES,
+    STANDARD_TOOL_NAMES,
+    create_tools,
+)
 
 
-class LangChainAgentToolTests(unittest.TestCase):
-    def test_read_and_write_file_are_root_guarded(self):
+class AgentToolContractTests(unittest.TestCase):
+    def test_standard_contract_exposes_only_container_shell(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            hidden_dir = case_dir / "hidden"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
-            hidden_dir.mkdir()
-            (case_dir / "task.md").write_text("hello", encoding="utf-8")
-            (hidden_dir / "oracle_fix.sql").write_text("secret", encoding="utf-8")
-            context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
-                command_timeout_sec=5,
-            )
+            context = ToolContext(execution_dir=root, trace_dir=root / "trace")
+
             tools = create_tools(context)
 
-            self.assertEqual(tools["read_file"]("task.md"), "hello")
-            self.assertIn("wrote", tools["write_file"]("note.txt", "fixed"))
-            self.assertEqual((work_dir / "note.txt").read_text(encoding="utf-8"), "fixed")
-            with self.assertRaises(ValueError):
-                tools["read_file"]("../outside.txt")
-            with self.assertRaises(ValueError):
-                tools["read_file"]("hidden/oracle_fix.sql")
-            with self.assertRaises(ValueError):
-                tools["write_file"](str(case_dir / "patch.sql"), "CREATE INDEX bad;")
+            self.assertEqual(tuple(tools), STANDARD_TOOL_NAMES)
+            self.assertEqual(STANDARD_TOOL_NAMES, ("shell",))
 
-    def test_shell_captures_output_and_writes_log(self):
+    def test_shell_runs_in_the_agent_execution_environment_and_logs_output(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
             context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
+                execution_dir=root,
+                trace_dir=root / "trace",
                 command_timeout_sec=5,
             )
-            tools = create_tools(context)
-
-            output = tools["shell"]("printf hi")
-
-            self.assertIn("returncode=0", output)
-            self.assertIn("hi", output)
-            self.assertTrue(list(trace_dir.glob("tool-shell-*.log")))
-
-    def test_shell_runs_locally_inside_agent_container(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
-            (case_dir / "docker-compose.yaml").write_text("services: {db: {}}\n", encoding="utf-8")
-            context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
-                command_timeout_sec=5,
-            )
-            tools = create_tools(context)
             calls = []
 
             def fake_run(command, **kwargs):
                 calls.append((command, kwargs))
                 return subprocess.CompletedProcess(command, 0, "inside container\n", "")
 
-            env = {
-                "OPSBENCH_AGENT_CONTAINER": "1",
-                "OPSBENCH_COMPOSE_PROJECT": "opsbench_test",
-                "OPSBENCH_SHELL_SERVICE": "db",
-            }
-            with patch.dict(os.environ, env, clear=False), patch(
-                "agents.langchain_react_agent.tools.subprocess.run",
-                side_effect=fake_run,
-            ):
-                output = tools["shell"]("pwd")
+            with patch("opsbench.agent_tools.subprocess.run", side_effect=fake_run):
+                output = create_tools(context)["shell"]("psql -h db -c 'SELECT 1'")
 
             self.assertIn("inside container", output)
             command, kwargs = calls[0]
+            self.assertEqual(command, "psql -h db -c 'SELECT 1'")
+            self.assertEqual(kwargs["cwd"], root.resolve())
+            self.assertTrue(kwargs["shell"])
+            self.assertTrue(list((root / "trace").glob("tool-shell-*.log")))
+
+    def test_kubernetes_standard_exposes_uniform_observability_contract(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            context = ToolContext(
+                execution_dir=root,
+                trace_dir=root / "trace",
+                tool_standard="kubernetes-observability-v1",
+                namespace="ops-case",
+            )
+
             self.assertEqual(
-                command,
-                "pwd",
+                tuple(create_tools(context)), KUBERNETES_OBSERVABILITY_TOOL_NAMES
             )
-            self.assertTrue(kwargs.get("shell", False))
-            self.assertEqual(kwargs["cwd"], case_dir.resolve())
 
-    def test_psql_query_uses_read_only_transaction_against_service_host(self):
+    def test_metrics_tool_discovers_prometheus_and_uses_service_proxy(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
             context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
-                command_timeout_sec=5,
+                execution_dir=root,
+                trace_dir=root / "trace",
+                tool_standard="kubernetes-observability-v1",
+                namespace="ops-case",
             )
-            tools = create_tools(context)
+            services = json.dumps(
+                {
+                    "items": [
+                        {
+                            "metadata": {"name": "demo-prometheus-server"},
+                            "spec": {"ports": [{"port": 9090}]},
+                        }
+                    ]
+                }
+            )
             calls = []
 
             def fake_run(command, **kwargs):
                 calls.append((command, kwargs))
-                return subprocess.CompletedProcess(command, 0, "1\n", "")
+                if len(calls) == 1:
+                    return subprocess.CompletedProcess(command, 0, services, "")
+                return subprocess.CompletedProcess(
+                    command, 0, '{"status":"success","data":{"result":[]}}', ""
+                )
 
-            with patch("agents.langchain_react_agent.tools.subprocess.run", side_effect=fake_run):
-                output = tools["psql_query"]("SELECT 1;")
+            with patch("opsbench.agent_tools.subprocess.run", side_effect=fake_run):
+                output = create_tools(context)["query_metrics"]("up == 0")
 
-            self.assertIn("returncode=0", output)
-            command, kwargs = calls[0]
-            self.assertEqual(command[:7], ["psql", "-h", "db", "-U", "opsbench", "-d", "opsbench"])
-            self.assertIn("BEGIN READ ONLY;", kwargs["input"])
-            self.assertIn("SELECT 1;", kwargs["input"])
-            self.assertIn("ROLLBACK;", kwargs["input"])
-            self.assertEqual(kwargs["env"]["PGPASSWORD"], "opsbench")
-            self.assertFalse(kwargs.get("shell", False))
+            self.assertIn('"status": "success"', output)
+            self.assertEqual(calls[0][0][:5], ["kubectl", "-n", "ops-case", "get", "services"])
+            proxy_path = calls[1][0][-1]
+            self.assertIn(
+                "/services/http:demo-prometheus-server:9090/proxy/api/v1/query",
+                proxy_path,
+            )
+            self.assertIn("query=up+%3D%3D+0", proxy_path)
+            self.assertFalse(calls[1][1]["shell"])
 
-    def test_psql_execute_runs_repair_sql_against_service_host(self):
+    def test_list_metrics_filters_and_limits_prometheus_metric_names(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
             context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
-                command_timeout_sec=5,
+                execution_dir=root,
+                trace_dir=root / "trace",
+                tool_standard="kubernetes-observability-v1",
+                namespace="ops-case",
             )
-            tools = create_tools(context)
-            calls = []
+            services = json.dumps(
+                {
+                    "items": [
+                        {
+                            "metadata": {"name": "demo-prometheus-server"},
+                            "spec": {"ports": [{"port": 9090}]},
+                        }
+                    ]
+                }
+            )
+            metric_names = json.dumps(
+                {
+                    "status": "success",
+                    "data": ["http_requests_total", "process_cpu_seconds_total", "up"],
+                }
+            )
+            responses = iter([services, metric_names])
 
             def fake_run(command, **kwargs):
-                calls.append((command, kwargs))
-                return subprocess.CompletedProcess(command, 0, "CREATE INDEX\n", "")
+                return subprocess.CompletedProcess(command, 0, next(responses), "")
 
-            sql = "CREATE INDEX idx_orders_customer_id ON orders(customer_id);"
-            with patch("agents.langchain_react_agent.tools.subprocess.run", side_effect=fake_run):
-                output = tools["psql_execute"](sql)
+            with patch("opsbench.agent_tools.subprocess.run", side_effect=fake_run):
+                output = create_tools(context)["list_metrics"]("total", 1)
 
-            self.assertIn("CREATE INDEX", output)
-            command, kwargs = calls[0]
-            self.assertEqual(command[:7], ["psql", "-h", "db", "-U", "opsbench", "-d", "opsbench"])
-            self.assertEqual(kwargs["input"], sql)
-            self.assertEqual(kwargs["env"]["PGPASSWORD"], "opsbench")
-            self.assertFalse(kwargs.get("shell", False))
+            self.assertIn('"returned": 1', output)
+            self.assertIn("http_requests_total", output)
+            self.assertNotIn("process_cpu_seconds_total", output)
 
-    def test_langchain_tool_returns_error_string_for_tool_misuse(self):
+    def test_langchain_adapter_preserves_the_standard_contract(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
+            context = ToolContext(execution_dir=root, trace_dir=root / "trace")
+            langchain_module = types.ModuleType("langchain")
+            tools_module = types.ModuleType("langchain.tools")
+            tools_module.tool = lambda fn: fn
+
+            with patch.dict(
+                sys.modules,
+                {"langchain": langchain_module, "langchain.tools": tools_module},
+            ):
+                tools = create_langchain_tools(context)
+
+            self.assertEqual(tuple(tool.__name__ for tool in tools), STANDARD_TOOL_NAMES)
+
+    def test_langchain_adapter_exposes_kubernetes_observability_contract(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
             context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd="/bin/true",
-                command_timeout_sec=5,
+                execution_dir=root,
+                trace_dir=root / "trace",
+                tool_standard="kubernetes-observability-v1",
+                namespace="ops-case",
             )
             langchain_module = types.ModuleType("langchain")
             tools_module = types.ModuleType("langchain.tools")
@@ -206,38 +178,10 @@ class LangChainAgentToolTests(unittest.TestCase):
             ):
                 tools = create_langchain_tools(context)
 
-            read_file = next(tool for tool in tools if tool.__name__ == "read_file")
-
-            output = read_file(str(case_dir))
-
-            self.assertIn("ERROR:", output)
-            self.assertIn("Is a directory", output)
-
-    def test_run_verifier_uses_verify_command(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            root = Path(temp_dir)
-            case_dir = root / "case"
-            work_dir = root / "work"
-            trace_dir = root / "trace"
-            case_dir.mkdir()
-            work_dir.mkdir()
-            trace_dir.mkdir()
-            verify = work_dir / "verify.sh"
-            verify.write_text("#!/usr/bin/env bash\necho verified\n", encoding="utf-8")
-            verify.chmod(0o755)
-            context = ToolContext(
-                case_dir=case_dir,
-                work_dir=work_dir,
-                trace_dir=trace_dir,
-                verify_cmd=str(verify),
-                command_timeout_sec=5,
+            self.assertEqual(
+                tuple(tool.__name__ for tool in tools),
+                KUBERNETES_OBSERVABILITY_TOOL_NAMES,
             )
-            tools = create_tools(context)
-
-            output = tools["run_verifier"]()
-
-            self.assertIn("verified", output)
-            self.assertTrue(context.verifier_called)
 
 
 if __name__ == "__main__":

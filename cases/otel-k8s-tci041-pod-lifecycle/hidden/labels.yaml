@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI041",
+  "scene": "事件",
+  "subscene": "CCE工作负载运行异常",
+  "fault_type": "pod_lifecycle",
+  "root_cause": "强制重启",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Pod"
+}

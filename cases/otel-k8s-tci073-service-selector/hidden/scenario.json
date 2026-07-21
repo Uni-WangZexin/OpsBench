@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci073-service-selector",
+  "tc": "TCI073",
+  "component": "frontend",
+  "resource": "Service/frontend",
+  "simulated_kind": "Service",
+  "severity": "warning",
+  "symptom": "CCE Nginx-Ingress访问异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/frontend reports service_selector=missing",
+  "state": {
+    "field": "service_selector",
+    "healthy": "matched",
+    "faulty": "missing"
+  }
+}

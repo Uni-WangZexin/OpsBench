@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci068-security-group-port-80",
+  "tc": "TCI068",
+  "component": "security-group",
+  "resource": "ConfigMap/security-group",
+  "simulated_kind": "CloudSecurityGroup",
+  "severity": "warning",
+  "symptom": "CCE网络不通：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/security-group reports security_group_port_80=deny",
+  "state": {
+    "field": "security_group_port_80",
+    "healthy": "allow",
+    "faulty": "deny"
+  }
+}

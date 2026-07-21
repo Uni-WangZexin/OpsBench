@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci056-scheduler-capacity",
+  "tc": "TCI056",
+  "component": "load-generator",
+  "resource": "Pod/load-generator",
+  "simulated_kind": "Pod",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Pod/load-generator reports scheduler_capacity=insufficient",
+  "state": {
+    "field": "scheduler_capacity",
+    "healthy": "available",
+    "faulty": "insufficient"
+  }
+}

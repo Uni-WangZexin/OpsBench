@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+import sys
+
+
+def main() -> int:
+    if "--version" in sys.argv[1:]:
+        print("jq-compatible OpsBench runtime client 1.0")
+        return 0
+    args = [arg for arg in sys.argv[1:] if arg not in {"-r", "--raw-output"}]
+    expression = args[0] if args else "."
+    value = json.load(sys.stdin)
+    if expression != ".":
+        if not expression.startswith("."):
+            print(f"jq shim: unsupported expression {expression}", file=sys.stderr)
+            return 2
+        for key in expression[1:].split("."):
+            if key:
+                value = value[key]
+    if isinstance(value, (dict, list)):
+        print(json.dumps(value, indent=2))
+    elif value is None:
+        print("null")
+    else:
+        print(value)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

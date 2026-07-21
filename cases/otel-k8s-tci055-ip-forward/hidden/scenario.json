@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci055-ip-forward",
+  "tc": "TCI055",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "Sysctl",
+  "severity": "warning",
+  "symptom": "CCE Node节点状态异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports ip_forward=0",
+  "state": {
+    "field": "ip_forward",
+    "healthy": "1",
+    "faulty": "0"
+  }
+}

@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import socket
+import sys
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print("nslookup shim: hostname is required", file=sys.stderr)
+        return 2
+    try:
+        addresses = sorted({item[4][0] for item in socket.getaddrinfo(sys.argv[1], None)})
+    except socket.gaierror as exc:
+        print(f"nslookup shim: {exc}", file=sys.stderr)
+        return 1
+    print(f"Name: {sys.argv[1]}")
+    for address in addresses:
+        print(f"Address: {address}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

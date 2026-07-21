@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci061-image-reference",
+  "tc": "TCI061",
+  "component": "frontend",
+  "resource": "Deployment/frontend",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/frontend reports image_reference=invalid-tag",
+  "state": {
+    "field": "image_reference",
+    "healthy": "valid",
+    "faulty": "invalid-tag"
+  }
+}

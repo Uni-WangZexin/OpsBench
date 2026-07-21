@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI052",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "cgroup_driver",
+  "root_cause": "修改kubelet源码或配置文件触发逻辑错误",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:KubeletConfiguration"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci052-cgroup-driver",
+  "tc": "TCI052",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "KubeletConfiguration",
+  "severity": "warning",
+  "symptom": "CCE Node节点状态异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports cgroup_driver=mismatched",
+  "state": {
+    "field": "cgroup_driver",
+    "healthy": "systemd",
+    "faulty": "mismatched"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI080",
+  "scene": "事件",
+  "subscene": "CCE域名解析失败",
+  "fault_type": "dns_egress_udp_53",
+  "root_cause": "VPC层面修改路由表（阻断53端口）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:CloudSecurityGroup"
+}

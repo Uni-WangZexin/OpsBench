@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI081",
+  "scene": "事件",
+  "subscene": "CCE域名解析失败",
+  "fault_type": "coredns_cpu_limit",
+  "root_cause": "限制DNS Pod资源（模拟性能不足）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

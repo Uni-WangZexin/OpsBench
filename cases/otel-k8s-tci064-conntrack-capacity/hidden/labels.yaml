@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI064",
+  "scene": "事件",
+  "subscene": "CCE网络时延增大",
+  "fault_type": "conntrack_capacity",
+  "root_cause": "模拟短连接洪水",
+  "difficulty": "Advanced",
+  "simulation": "kubernetes-state:Pod"
+}

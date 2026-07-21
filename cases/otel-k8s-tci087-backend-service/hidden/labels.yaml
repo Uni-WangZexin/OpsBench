@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI087",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "backend_service",
+  "root_cause": "删除后端Service",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Service"
+}

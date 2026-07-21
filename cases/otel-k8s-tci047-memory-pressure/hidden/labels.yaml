@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI047",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "memory_pressure",
+  "root_cause": "内存过载",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

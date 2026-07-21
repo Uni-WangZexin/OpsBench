@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci043-pod-connectivity",
+  "tc": "TCI043",
+  "component": "frontend",
+  "resource": "NetworkPolicy/frontend",
+  "simulated_kind": "NetworkPolicy",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "NetworkPolicy/frontend reports pod_connectivity=denied",
+  "state": {
+    "field": "pod_connectivity",
+    "healthy": "allowed",
+    "faulty": "denied"
+  }
+}

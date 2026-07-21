@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci085-upstream-retries",
+  "tc": "TCI085",
+  "component": "frontend",
+  "resource": "Ingress/frontend",
+  "simulated_kind": "Ingress",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Ingress/frontend reports upstream_retries=1",
+  "state": {
+    "field": "upstream_retries",
+    "healthy": "3",
+    "faulty": "1"
+  }
+}

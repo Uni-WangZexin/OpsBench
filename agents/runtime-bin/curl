@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import sys
+import urllib.error
+import urllib.request
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    if "--version" in args:
+        print("curl-compatible OpsBench runtime client 1.0")
+        return 0
+    method = "GET"
+    headers: dict[str, str] = {}
+    data: bytes | None = None
+    output_path = ""
+    fail = False
+    head = False
+    url = ""
+    index = 0
+    while index < len(args):
+        arg = args[index]
+        if arg in {"-s", "-S", "-sS", "--silent", "--show-error", "-L", "--location", "-v"}:
+            index += 1
+        elif arg in {"-f", "--fail"}:
+            fail = True
+            index += 1
+        elif arg in {"-I", "--head"}:
+            head = True
+            method = "HEAD"
+            index += 1
+        elif arg in {"-X", "--request"}:
+            method = args[index + 1]
+            index += 2
+        elif arg in {"-H", "--header"}:
+            key, value = args[index + 1].split(":", 1)
+            headers[key.strip()] = value.strip()
+            index += 2
+        elif arg in {"-d", "--data", "--data-raw"}:
+            data = args[index + 1].encode()
+            if method == "GET":
+                method = "POST"
+            index += 2
+        elif arg in {"-o", "--output"}:
+            output_path = args[index + 1]
+            index += 2
+        elif arg.startswith("-"):
+            print(f"curl shim: unsupported option {arg}", file=sys.stderr)
+            return 2
+        else:
+            url = arg
+            index += 1
+    if not url:
+        print("curl shim: URL is required", file=sys.stderr)
+        return 2
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            body = b"" if head else response.read()
+            if head:
+                body = "".join(f"{key}: {value}\n" for key, value in response.headers.items()).encode()
+            if output_path:
+                if output_path != "/dev/null":
+                    with open(output_path, "wb") as output:
+                        output.write(body)
+            else:
+                sys.stdout.buffer.write(body)
+            return 0
+    except urllib.error.HTTPError as exc:
+        if not fail:
+            sys.stdout.buffer.write(exc.read())
+        print(f"curl shim: HTTP {exc.code}", file=sys.stderr)
+        return 22
+    except OSError as exc:
+        print(f"curl shim: {exc}", file=sys.stderr)
+        return 7
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

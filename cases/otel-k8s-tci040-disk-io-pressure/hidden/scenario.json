@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci040-disk-io-pressure",
+  "tc": "TCI040",
+  "component": "accounting",
+  "resource": "Pod/accounting",
+  "simulated_kind": "Pod",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Pod/accounting reports disk_io_pressure=saturated",
+  "state": {
+    "field": "disk_io_pressure",
+    "healthy": "normal",
+    "faulty": "saturated"
+  }
+}

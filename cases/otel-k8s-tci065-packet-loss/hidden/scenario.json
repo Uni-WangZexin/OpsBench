@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci065-packet-loss",
+  "tc": "TCI065",
+  "component": "frontend",
+  "resource": "NetworkPolicy/frontend",
+  "simulated_kind": "NetworkPolicy",
+  "severity": "warning",
+  "symptom": "CCE网络时延增大：OpenTelemetry Demo 服务状态异常",
+  "signal": "NetworkPolicy/frontend reports packet_loss=50%",
+  "state": {
+    "field": "packet_loss",
+    "healthy": "0%",
+    "faulty": "50%"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci082-dns-query-rate",
+  "tc": "TCI082",
+  "component": "dns-stress-test",
+  "resource": "Job/dns-stress-test",
+  "simulated_kind": "Job",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "Job/dns-stress-test reports dns_query_rate=overloaded",
+  "state": {
+    "field": "dns_query_rate",
+    "healthy": "normal",
+    "faulty": "overloaded"
+  }
+}

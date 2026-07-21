@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci076-controller-image",
+  "tc": "TCI076",
+  "component": "ingress-nginx-controller",
+  "resource": "Deployment/ingress-nginx-controller",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE Nginx-Ingress访问异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/ingress-nginx-controller reports controller_image=invalid",
+  "state": {
+    "field": "controller_image",
+    "healthy": "valid",
+    "faulty": "invalid"
+  }
+}

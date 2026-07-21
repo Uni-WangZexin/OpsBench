@@ -14,6 +14,8 @@ The benchmark shape is intentionally case-package first:
 ```text
 opsbench/                         # Python CLI and harness
 cases/postgres-missing-index-001/ # Self-contained PostgreSQL case package
+cases/otel-k8s-tci*/              # TCI038-TCI092 Kubernetes incident cases
+cases/_kubernetes_otel/           # Shared OpenTelemetry Demo lifecycle scripts
 agents/langchain-react-agent/     # LangChain ReAct/tool agent wrapper
 results/runs.jsonl                # Generated run records
 results/traces/                   # Generated phase and agent traces
@@ -50,7 +52,7 @@ python3 -m unittest discover -v
 
 ## LangChain ReAct Agent
 
-`agents/langchain-react-agent/run.sh` is a real model-backed agent. It runs inside the `agent-runner` container in Docker mode, uses LangChain's packaged agent API with strong shell tools, and calls DeepSeek through an OpenAI-compatible endpoint.
+`agents/langchain-react-agent/run.sh` is a real model-backed agent. It runs inside the `agent-runner` container, adapts the case's benchmark-owned tool standard to LangChain, and calls DeepSeek through an OpenAI-compatible endpoint.
 
 Install the optional agent dependencies:
 
@@ -76,7 +78,7 @@ python3 -m opsbench.cli run \
   --results-dir results
 ```
 
-This agent has a strong `shell` tool. In Docker mode the agent process itself runs in the `agent-runner` container, so shell commands execute there and can reach PostgreSQL at the Compose hostname `db`. Its pass/fail result depends on model behavior and network/API availability.
+The agent process runs in the `agent-runner` container. Its tools therefore execute in that container and can reach only the runtime resources exposed to it. Its pass/fail result depends on model behavior and network/API availability.
 
 ## Agent Protocol
 
@@ -99,18 +101,102 @@ OPSBENCH_AGENT_CONTAINER
 OPSBENCH_COMPOSE_PROJECT
 OPSBENCH_SHELL_SERVICE
 OPSBENCH_TRACE_DIR
-OPSBENCH_VERIFY_CMD
 ```
 
-With Docker enabled, the runner launches agents through `docker compose run --rm --build agent-runner ...` and mounts the repo, generated work directory, and trace directory into that container. Agent tools execute inside the agent container; the runner still runs the final verifier from the host after the agent exits.
+With Docker enabled, the runner launches agents through `docker compose run --rm --build agent-runner ...`. Agent actions execute inside that container and reach case services only through the container environment and Compose network. The runner performs injection, scoring, and final verification outside the agent after it exits.
 
-The LangChain agent exposes operations-style tools:
+## Standard Tool Contract
 
-- `psql_query(sql)` runs read-only PostgreSQL diagnostics against the case database.
-- `psql_execute(sql)` runs repair SQL such as `CREATE INDEX`.
-- `read_file(path)` reads public case files or work files, but blocks hidden benchmark controls.
-- `write_file(path, content)` writes only inside the generated work directory for notes or temporary SQL.
-- `shell(command)` remains available for local in-container diagnostics.
+Every ranked agent receives the same benchmark-owned tool surface:
+
+- `shell(command)` runs a command inside the agent container and returns its exit code, stdout, and stderr.
+
+Agent frameworks and reasoning-loop designs may differ, but their adapters must expose exactly this tool contract. Database diagnosis and repair use command-line clients available in the container, for example `psql -h db -U opsbench -d opsbench`. File reader/writer tools and verifier tools are not part of the contract.
+
+The verifier is bench infrastructure, not an agent action. Agents do not receive its command or output; OpsBench runs it once after the agent process finishes.
+
+## Kubernetes OpenTelemetry Cases
+
+The repository includes 55 Kubernetes cases generated from `故障.md`, covering
+TCI038 through TCI092. Every fault has its own `cases/otel-k8s-tci*/` directory.
+Each generated directory is self-contained and follows the same case layout:
+
+```text
+manifest.yaml
+docker-compose.yaml
+task.md
+scripts/{common,setup,inject,check_injected,verify,cleanup}.py
+hidden/{labels.yaml,scenario.json}
+```
+
+`cases/_kubernetes_otel/` is only the canonical generation source; runtime
+manifests do not reference files outside their own case directory.
+All cases use the baseline from `基准环境.md`:
+
+- Kubernetes 1.24 or newer.
+- At least 6 GiB of available application memory.
+- OpenTelemetry Demo installed from
+  `open-telemetry/opentelemetry-demo` with Helm Chart 0.11.0 by default.
+- A dedicated namespace for each run, followed by automatic cleanup.
+
+Huawei Cloud-specific concepts such as CCE node state, EVS, OBS, security
+groups, ACLs, ELB, and EIP are represented as namespace-scoped Kubernetes
+resources, labels, observations, and Events. This preserves the diagnostic
+state transition without modifying real cloud resources or cluster nodes.
+
+The Kubernetes cases use the uniform `kubernetes-observability-v1` standard.
+Every competing agent receives the same benchmark-owned tools for every
+Kubernetes case:
+
+- `shell`: inspect and repair resources with the installed command-line clients.
+- `kubectl_logs`: read current or previous Pod logs in the case namespace.
+- `list_metrics`: discover Prometheus metric names with optional filtering.
+- `query_metrics`: run instant PromQL queries against Demo Prometheus.
+- `search_traces` and `get_trace`: search and retrieve traces from Jaeger.
+- `query_logs`: search the Demo OpenSearch log backend.
+
+The observability tools discover Services in the current namespace and use the
+Kubernetes API Service Proxy. They are read-only and do not expose arbitrary
+network destinations. Scenario-appropriate clients are also installed in the
+agent container and declared per case:
+
+- Workload, node, scheduling, storage: `kubectl`, `helm`, `jq`.
+- Network and ingress: `kubectl`, `helm`, `curl`, `jq`.
+- DNS: `kubectl`, `helm`, `dig`, `nslookup`, `jq`.
+
+During setup, the runner creates a short-lived ServiceAccount and namespace-only
+Role for the run. Only that restricted kubeconfig is mounted read-only into the
+isolated agent container; the host/admin kubeconfig, case directory, generated
+work directory, and hidden benchmark controls are not mounted.
+
+This tool surface follows the official
+[OpenTelemetry Demo Helm deployment](https://opentelemetry.io/docs/platforms/kubernetes/helm/demo/)
+and its Prometheus, Jaeger, and OpenSearch backends.
+
+Run a case with an existing cluster context:
+
+```bash
+python3 -m opsbench.cli run \
+  --case cases/otel-k8s-tci061-image-reference \
+  --agent agents/langchain-react-agent/run.sh \
+  --results-dir results
+```
+
+Useful environment overrides:
+
+```text
+KUBECONFIG
+OPSBENCH_OTEL_CHART_VERSION
+OPSBENCH_OTEL_SKIP_INSTALL
+```
+
+`OPSBENCH_OTEL_SKIP_INSTALL=1` is intended only for development against a
+namespace where the baseline application lifecycle is managed separately.
+Regenerate the case directories after editing `故障.md` or the scenario catalog:
+
+```bash
+python3 tools/generate_kubernetes_cases.py
+```
 
 ## Case Notes
 

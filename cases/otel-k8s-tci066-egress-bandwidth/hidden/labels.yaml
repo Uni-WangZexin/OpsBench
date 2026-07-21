@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI066",
+  "scene": "事件",
+  "subscene": "CCE网络时延增大",
+  "fault_type": "egress_bandwidth",
+  "root_cause": "带宽压测",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Service"
+}

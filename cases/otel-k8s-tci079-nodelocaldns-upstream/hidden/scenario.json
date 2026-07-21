@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci079-nodelocaldns-upstream",
+  "tc": "TCI079",
+  "component": "nodelocaldns",
+  "resource": "ConfigMap/nodelocaldns",
+  "simulated_kind": "ConfigMap",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/nodelocaldns reports nodelocaldns_upstream=127.0.0.1:9999",
+  "state": {
+    "field": "nodelocaldns_upstream",
+    "healthy": "kube-dns",
+    "faulty": "127.0.0.1:9999"
+  }
+}

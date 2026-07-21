@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI058",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "volume_zone",
+  "root_cause": "EVS挂载异常",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:PersistentVolume"
+}

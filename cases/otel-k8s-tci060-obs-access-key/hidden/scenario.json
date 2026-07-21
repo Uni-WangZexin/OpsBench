@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci060-obs-access-key",
+  "tc": "TCI060",
+  "component": "telemetry-export",
+  "resource": "Secret/telemetry-export",
+  "simulated_kind": "Secret",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Secret/telemetry-export reports obs_access_key=invalid",
+  "state": {
+    "field": "obs_access_key",
+    "healthy": "valid",
+    "faulty": "invalid"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI078",
+  "scene": "事件",
+  "subscene": "CCE域名解析失败",
+  "fault_type": "dns_ingress",
+  "root_cause": "注入网络策略（禁止DNS查询）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:NetworkPolicy"
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI079",
+  "scene": "事件",
+  "subscene": "CCE域名解析失败",
+  "fault_type": "nodelocaldns_upstream",
+  "root_cause": "修改NodeLocal DNS缓存配置",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:ConfigMap"
+}

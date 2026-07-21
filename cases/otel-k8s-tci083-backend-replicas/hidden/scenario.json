@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci083-backend-replicas",
+  "tc": "TCI083",
+  "component": "checkout",
+  "resource": "Deployment/checkout",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/checkout reports backend_replicas=0",
+  "state": {
+    "field": "backend_replicas",
+    "healthy": "2",
+    "faulty": "0"
+  }
+}

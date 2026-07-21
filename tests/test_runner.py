@@ -45,7 +45,6 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue((trace_dir / "agent-trace.md").exists())
             trace = (trace_dir / "agent-trace.md").read_text(encoding="utf-8")
             self.assertIn("Shell service: db", trace)
-            self.assertTrue((trace_dir / "agent-verify.json").exists())
             self.assertTrue((results_dir / "runs.jsonl").exists())
 
             recorded_lines = (results_dir / "runs.jsonl").read_text(encoding="utf-8").splitlines()
@@ -111,24 +110,24 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("--build", agent_command)
             self.assertIn("-T", agent_command)
             self.assertIn("agent-runner", agent_command)
-            self.assertIn(f"{root.resolve()}:/workspace", agent_command)
-            self.assertIn(f"{workspace_dir}:/work", agent_command)
+            self.assertIn(f"{agent_path.parent.resolve()}:/agent:ro", agent_command)
+            self.assertIn(f"{workspace_dir / 'task.md'}:/task/task.md:ro", agent_command)
             self.assertIn(f"{trace_dir.resolve()}:/trace", agent_command)
             self.assertIn("OPSBENCH_AGENT_CONTAINER=1", agent_command)
             self.assertIn("OPSBENCH_TRACE_DIR=/trace", agent_command)
-            self.assertIn("OPSBENCH_VERIFY_CMD=", agent_command)
+            self.assertFalse(any("OPSBENCH_VERIFY_CMD" in part for part in agent_command))
 
             service_index = agent_command.index("agent-runner")
             self.assertEqual(
                 agent_command[service_index + 1 : service_index + 10],
                 [
-                    "/workspace/agents/fake-agent/run.sh",
+                    "/agent/run.sh",
                     "--case-dir",
-                    "/workspace/cases/fake-case",
+                    "/case",
                     "--task",
-                    "/work/task.md",
+                    "/task/task.md",
                     "--work-dir",
-                    "/work",
+                    "/tmp/agent-work",
                     "--timeout-sec",
                     "20",
                 ],
@@ -156,6 +155,11 @@ class RunnerTests(unittest.TestCase):
                     },
                     "task": "task.md",
                     "hidden_metadata": "hidden/labels.yaml",
+                    "tool_standard": {
+                        "id": "postgres-ops-v1",
+                        "tools": ["shell"],
+                        "commands": ["psql"],
+                    },
                     "timeouts": {"agent_sec": 20},
                 }
             ),
@@ -264,7 +268,6 @@ class RunnerTests(unittest.TestCase):
                   echo "fake agent read task"
                   echo "Shell service: ${OPSBENCH_SHELL_SERVICE:-}"
                 } > "$OPSBENCH_TRACE_DIR/agent-trace.md"
-                "$OPSBENCH_VERIFY_CMD" > "$OPSBENCH_TRACE_DIR/agent-verify.json"
                 """
             ),
             encoding="utf-8",

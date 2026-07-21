@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI048",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "disk_io_pressure",
+  "root_cause": "磁盘IO过载",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci066-egress-bandwidth",
+  "tc": "TCI066",
+  "component": "frontend-proxy",
+  "resource": "Service/frontend-proxy",
+  "simulated_kind": "Service",
+  "severity": "warning",
+  "symptom": "CCE网络时延增大：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/frontend-proxy reports egress_bandwidth=saturated",
+  "state": {
+    "field": "egress_bandwidth",
+    "healthy": "normal",
+    "faulty": "saturated"
+  }
+}

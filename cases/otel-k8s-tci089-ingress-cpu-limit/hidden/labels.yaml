@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI089",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "ingress_cpu_limit",
+  "root_cause": "限制Ingress Controller资源（人为制造CPU瓶颈）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

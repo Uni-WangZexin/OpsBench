@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci078-dns-ingress",
+  "tc": "TCI078",
+  "component": "coredns",
+  "resource": "NetworkPolicy/coredns",
+  "simulated_kind": "NetworkPolicy",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "NetworkPolicy/coredns reports dns_ingress=denied",
+  "state": {
+    "field": "dns_ingress",
+    "healthy": "allowed",
+    "faulty": "denied"
+  }
+}

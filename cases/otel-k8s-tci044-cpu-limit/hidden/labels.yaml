@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI044",
+  "scene": "事件",
+  "subscene": "CCE工作负载运行异常",
+  "fault_type": "cpu_limit",
+  "root_cause": "CPU limits",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Deployment"
+}

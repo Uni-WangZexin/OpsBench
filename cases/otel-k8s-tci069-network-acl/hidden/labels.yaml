@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI069",
+  "scene": "事件",
+  "subscene": "CCE网络不通",
+  "fault_type": "network_acl",
+  "root_cause": "修改ACL规则（模拟误操作）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:CloudNetworkACL"
+}

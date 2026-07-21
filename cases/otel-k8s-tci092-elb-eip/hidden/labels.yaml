@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI092",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "elb_eip",
+  "root_cause": "ELB状态异常（不绑定EIP）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:CloudLoadBalancer"
+}

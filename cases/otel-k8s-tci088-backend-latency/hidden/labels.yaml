@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI088",
+  "scene": "事件",
+  "subscene": "CCE ELB-Ingress异常",
+  "fault_type": "backend_latency",
+  "root_cause": "模拟网络延迟",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Pod"
+}

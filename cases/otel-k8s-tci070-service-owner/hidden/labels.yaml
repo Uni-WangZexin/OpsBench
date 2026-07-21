@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI070",
+  "scene": "事件",
+  "subscene": "CCE网络不通",
+  "fault_type": "service_owner",
+  "root_cause": "恶意创建同名Service",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Service"
+}

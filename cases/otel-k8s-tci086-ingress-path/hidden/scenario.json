@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci086-ingress-path",
+  "tc": "TCI086",
+  "component": "frontend",
+  "resource": "Ingress/frontend",
+  "simulated_kind": "Ingress",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Ingress/frontend reports ingress_path=/wrong-path",
+  "state": {
+    "field": "ingress_path",
+    "healthy": "/",
+    "faulty": "/wrong-path"
+  }
+}

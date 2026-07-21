@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci091-tls-certificate",
+  "tc": "TCI091",
+  "component": "frontend-tls",
+  "resource": "Secret/frontend-tls",
+  "simulated_kind": "Secret",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Secret/frontend-tls reports tls_certificate=expired",
+  "state": {
+    "field": "tls_certificate",
+    "healthy": "valid",
+    "faulty": "expired"
+  }
+}

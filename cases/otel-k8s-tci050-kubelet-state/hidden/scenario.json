@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci050-kubelet-state",
+  "tc": "TCI050",
+  "component": "worker-0",
+  "resource": "Node/worker-0",
+  "simulated_kind": "Node",
+  "severity": "warning",
+  "symptom": "CCE Node节点状态异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Node/worker-0 reports kubelet_state=stopped",
+  "state": {
+    "field": "kubelet_state",
+    "healthy": "running",
+    "faulty": "stopped"
+  }
+}

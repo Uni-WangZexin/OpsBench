@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI072",
+  "scene": "事件",
+  "subscene": "CCE Nginx-Ingress访问异常",
+  "fault_type": "session_affinity",
+  "root_cause": "关闭Ingress的affinity配置",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Ingress"
+}

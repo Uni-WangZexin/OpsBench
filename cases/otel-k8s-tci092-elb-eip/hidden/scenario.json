@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci092-elb-eip",
+  "tc": "TCI092",
+  "component": "frontend-proxy",
+  "resource": "Service/frontend-proxy",
+  "simulated_kind": "CloudLoadBalancer",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/frontend-proxy reports elb_eip=unbound",
+  "state": {
+    "field": "elb_eip",
+    "healthy": "bound",
+    "faulty": "unbound"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci090-ssl-redirect",
+  "tc": "TCI090",
+  "component": "frontend",
+  "resource": "Ingress/frontend",
+  "simulated_kind": "Ingress",
+  "severity": "warning",
+  "symptom": "CCE ELB-Ingress异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Ingress/frontend reports ssl_redirect=false",
+  "state": {
+    "field": "ssl_redirect",
+    "healthy": "true",
+    "faulty": "false"
+  }
+}

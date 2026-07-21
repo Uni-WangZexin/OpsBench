@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci063-subnet-ip-capacity",
+  "tc": "TCI063",
+  "component": "otel-demo",
+  "resource": "Namespace/otel-demo",
+  "simulated_kind": "NetworkAttachment",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Namespace/otel-demo reports subnet_ip_capacity=exhausted",
+  "state": {
+    "field": "subnet_ip_capacity",
+    "healthy": "available",
+    "faulty": "exhausted"
+  }
+}

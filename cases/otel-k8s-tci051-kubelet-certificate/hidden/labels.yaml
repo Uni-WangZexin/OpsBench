@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI051",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "kubelet_certificate",
+  "root_cause": "模拟证书过期",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Certificate"
+}

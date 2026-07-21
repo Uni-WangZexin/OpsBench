@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI057",
+  "scene": "事件",
+  "subscene": "CCE工作负载创删异常",
+  "fault_type": "node_affinity",
+  "root_cause": "亲和性配置",
+  "difficulty": "Advanced",
+  "simulation": "kubernetes-state:Deployment"
+}

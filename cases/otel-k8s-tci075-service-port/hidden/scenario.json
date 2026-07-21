@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci075-service-port",
+  "tc": "TCI075",
+  "component": "frontend-proxy",
+  "resource": "Service/frontend-proxy",
+  "simulated_kind": "Service",
+  "severity": "warning",
+  "symptom": "CCE Nginx-Ingress访问异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/frontend-proxy reports service_port=8080",
+  "state": {
+    "field": "service_port",
+    "healthy": "80",
+    "faulty": "8080"
+  }
+}

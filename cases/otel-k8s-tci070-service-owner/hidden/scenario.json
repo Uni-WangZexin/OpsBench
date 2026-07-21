@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci070-service-owner",
+  "tc": "TCI070",
+  "component": "critical-svc",
+  "resource": "Service/critical-svc",
+  "simulated_kind": "Service",
+  "severity": "warning",
+  "symptom": "CCE网络不通：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/critical-svc reports service_owner=shadowed",
+  "state": {
+    "field": "service_owner",
+    "healthy": "expected",
+    "faulty": "shadowed"
+  }
+}

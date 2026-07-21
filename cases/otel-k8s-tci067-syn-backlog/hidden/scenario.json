@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci067-syn-backlog",
+  "tc": "TCI067",
+  "component": "frontend-proxy",
+  "resource": "Service/frontend-proxy",
+  "simulated_kind": "Service",
+  "severity": "critical",
+  "symptom": "CCE网络时延增大：OpenTelemetry Demo 服务状态异常",
+  "signal": "Service/frontend-proxy reports syn_backlog=flooded",
+  "state": {
+    "field": "syn_backlog",
+    "healthy": "normal",
+    "faulty": "flooded"
+  }
+}

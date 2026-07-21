@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci039-memory-pressure",
+  "tc": "TCI039",
+  "component": "frontend",
+  "resource": "Deployment/frontend",
+  "simulated_kind": "Deployment",
+  "severity": "warning",
+  "symptom": "CCE工作负载运行异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "Deployment/frontend reports memory_pressure=exhausted",
+  "state": {
+    "field": "memory_pressure",
+    "healthy": "normal",
+    "faulty": "exhausted"
+  }
+}

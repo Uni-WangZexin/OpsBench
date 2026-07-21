@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI075",
+  "scene": "事件",
+  "subscene": "CCE Nginx-Ingress访问异常",
+  "fault_type": "service_port",
+  "root_cause": "通过K8s Service覆盖ELB配置",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Service"
+}

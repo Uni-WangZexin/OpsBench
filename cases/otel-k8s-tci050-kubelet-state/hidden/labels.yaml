@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI050",
+  "scene": "事件",
+  "subscene": "CCE Node节点状态异常",
+  "fault_type": "kubelet_state",
+  "root_cause": "手动停止组件",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Node"
+}

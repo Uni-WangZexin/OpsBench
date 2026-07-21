@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci062-image-pull-secret",
+  "tc": "TCI062",
+  "component": "default",
+  "resource": "ServiceAccount/default",
+  "simulated_kind": "Secret",
+  "severity": "warning",
+  "symptom": "CCE工作负载创删异常：OpenTelemetry Demo 服务状态异常",
+  "signal": "ServiceAccount/default reports image_pull_secret=invalid",
+  "state": {
+    "field": "image_pull_secret",
+    "healthy": "valid",
+    "faulty": "invalid"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI074",
+  "scene": "事件",
+  "subscene": "CCE Nginx-Ingress访问异常",
+  "fault_type": "rewrite_target",
+  "root_cause": "错误配置路径重写规则",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:Ingress"
+}

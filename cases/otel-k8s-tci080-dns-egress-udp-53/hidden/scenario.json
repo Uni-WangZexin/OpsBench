@@ -1,0 +1,15 @@
+{
+  "id": "otel-k8s-tci080-dns-egress-udp-53",
+  "tc": "TCI080",
+  "component": "vpc-dns-policy",
+  "resource": "ConfigMap/vpc-dns-policy",
+  "simulated_kind": "CloudSecurityGroup",
+  "severity": "warning",
+  "symptom": "CCE域名解析失败：OpenTelemetry Demo 服务状态异常",
+  "signal": "ConfigMap/vpc-dns-policy reports dns_egress_udp_53=denied",
+  "state": {
+    "field": "dns_egress_udp_53",
+    "healthy": "allowed",
+    "faulty": "denied"
+  }
+}

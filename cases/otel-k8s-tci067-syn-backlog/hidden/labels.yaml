@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI067",
+  "scene": "事件",
+  "subscene": "CCE网络时延增大",
+  "fault_type": "syn_backlog",
+  "root_cause": "模拟SYN Flood",
+  "difficulty": "Advanced",
+  "simulation": "kubernetes-state:Service"
+}

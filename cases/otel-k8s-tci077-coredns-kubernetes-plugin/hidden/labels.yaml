@@ -1,0 +1,11 @@
+{
+  "domain": "kubernetes",
+  "system": "opentelemetry-demo",
+  "source_tc": "TCI077",
+  "scene": "事件",
+  "subscene": "CCE域名解析失败",
+  "fault_type": "coredns_kubernetes_plugin",
+  "root_cause": "修改CoreDNS配置（模拟配置错误）",
+  "difficulty": "Basic",
+  "simulation": "kubernetes-state:ConfigMap"
+}
