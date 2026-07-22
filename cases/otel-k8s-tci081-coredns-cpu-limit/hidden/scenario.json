@@ -11,5 +11,10 @@
     "field": "coredns_cpu_limit",
     "healthy": "200m",
     "faulty": "50m"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "dns",
+    "target": "kube-dns"
   }
 }

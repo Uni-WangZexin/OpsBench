@@ -7,5 +7,5 @@
   "fault_type": "node_network",
   "root_cause": "网络异常",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:node"
 }

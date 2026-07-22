@@ -7,5 +7,5 @@
   "fault_type": "packet_loss",
   "root_cause": "数据丢包",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:NetworkPolicy"
+  "injection": "kubernetes-real:proxy"
 }

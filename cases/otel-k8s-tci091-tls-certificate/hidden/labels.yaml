@@ -7,5 +7,5 @@
   "fault_type": "tls_certificate",
   "root_cause": "过期证书不轮换",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Secret"
+  "injection": "kubernetes-real:config_probe"
 }

@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-cpu-runaway-002",
+  "implementation": {
+    "strategy": "cpu_runaway"
+  }
+}

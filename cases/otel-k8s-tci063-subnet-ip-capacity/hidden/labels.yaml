@@ -7,5 +7,5 @@
   "fault_type": "subnet_ip_capacity",
   "root_cause": "子网不足",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:NetworkAttachment"
+  "injection": "kubernetes-real:quota"
 }

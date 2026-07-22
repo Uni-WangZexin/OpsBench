@@ -13,8 +13,13 @@
   "task": "task.md",
   "hidden_metadata": "hidden/labels.yaml",
   "tool_standard": {
-    "id": "postgres-ops-v1",
-    "tools": ["shell"],
+    "id": "postgres-operations-v2",
+    "tools": [
+      "shell",
+      "inspect_database",
+      "query_database",
+      "explain_query"
+    ],
     "commands": ["psql"]
   },
   "timeouts": {

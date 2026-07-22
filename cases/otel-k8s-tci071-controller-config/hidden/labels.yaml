@@ -7,5 +7,5 @@
   "fault_type": "controller_config",
   "root_cause": "在ConfigMap中注入错误参数",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:ConfigMap"
+  "injection": "kubernetes-real:config_probe"
 }

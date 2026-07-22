@@ -11,5 +11,13 @@
     "field": "cpu_pressure",
     "healthy": "false",
     "faulty": "true"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "cpu",
+    "target": "node",
+    "workers": 4,
+    "active_threshold": 2.0,
+    "recovery_threshold": 0.2
   }
 }

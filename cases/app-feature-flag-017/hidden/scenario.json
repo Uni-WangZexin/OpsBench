@@ -1,0 +1,6 @@
+{
+  "case_id": "app-feature-flag-017",
+  "implementation": {
+    "strategy": "feature_flag"
+  }
+}

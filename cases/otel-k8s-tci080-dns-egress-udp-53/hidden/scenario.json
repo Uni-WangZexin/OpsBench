@@ -11,5 +11,10 @@
     "field": "dns_egress_udp_53",
     "healthy": "allowed",
     "faulty": "denied"
+  },
+  "implementation": {
+    "strategy": "network_policy",
+    "component": "loadgenerator",
+    "fault": "deny_egress"
   }
 }

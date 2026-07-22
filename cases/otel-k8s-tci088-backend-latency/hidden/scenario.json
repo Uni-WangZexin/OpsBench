@@ -11,5 +11,10 @@
     "field": "backend_latency",
     "healthy": "0ms",
     "faulty": "500ms"
+  },
+  "implementation": {
+    "strategy": "proxy",
+    "component": "checkoutservice",
+    "mode": "latency"
   }
 }

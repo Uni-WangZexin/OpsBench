@@ -7,5 +7,5 @@
   "fault_type": "controller_image",
   "root_cause": "创建的nginx状态非正常",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

@@ -11,5 +11,9 @@
     "field": "scheduler_capacity",
     "healthy": "available",
     "faulty": "insufficient"
+  },
+  "implementation": {
+    "strategy": "pending",
+    "fault": "oversized_cpu"
   }
 }

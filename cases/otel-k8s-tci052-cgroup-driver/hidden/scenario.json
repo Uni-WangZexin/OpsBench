@@ -11,5 +11,11 @@
     "field": "cgroup_driver",
     "healthy": "systemd",
     "faulty": "mismatched"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "cgroup-driver",
+    "healthy": "systemd",
+    "faulty": "cgroupfs"
   }
 }

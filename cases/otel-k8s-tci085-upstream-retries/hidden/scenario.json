@@ -11,5 +11,11 @@
     "field": "upstream_retries",
     "healthy": "3",
     "faulty": "1"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "upstream-retries",
+    "healthy": "3",
+    "faulty": "1"
   }
 }

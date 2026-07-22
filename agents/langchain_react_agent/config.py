@@ -21,6 +21,6 @@ def load_config() -> AgentConfig:
         api_key=api_key,
         base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
         model=os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-pro"),
-        max_steps=int(os.environ.get("LANGCHAIN_MAX_STEPS", "30")),
+        max_steps=int(os.environ.get("LANGCHAIN_MAX_STEPS", "60")),
         temperature=float(os.environ.get("LANGCHAIN_TEMPERATURE", "0")),
     )

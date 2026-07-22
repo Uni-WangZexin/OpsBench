@@ -7,5 +7,5 @@
   "fault_type": "root_filesystem",
   "root_cause": "强制挂载为只读",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:deployment"
 }

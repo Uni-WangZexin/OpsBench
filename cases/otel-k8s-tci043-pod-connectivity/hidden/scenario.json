@@ -11,5 +11,10 @@
     "field": "pod_connectivity",
     "healthy": "allowed",
     "faulty": "denied"
+  },
+  "implementation": {
+    "strategy": "network_policy",
+    "component": "frontend",
+    "fault": "deny_ingress"
   }
 }

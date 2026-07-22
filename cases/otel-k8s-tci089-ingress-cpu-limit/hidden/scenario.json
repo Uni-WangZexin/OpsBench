@@ -11,5 +11,12 @@
     "field": "ingress_cpu_limit",
     "healthy": "500m",
     "faulty": "100m"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "frontendproxy",
+    "fault": "cpu_limit",
+    "healthy": null,
+    "faulty": "100m"
   }
 }

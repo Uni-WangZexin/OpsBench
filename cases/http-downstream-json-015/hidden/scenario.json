@@ -1,0 +1,6 @@
+{
+  "case_id": "http-downstream-json-015",
+  "implementation": {
+    "strategy": "dependency_payload"
+  }
+}

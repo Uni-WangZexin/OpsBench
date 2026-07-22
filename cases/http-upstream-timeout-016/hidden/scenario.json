@@ -1,0 +1,6 @@
+{
+  "case_id": "http-upstream-timeout-016",
+  "implementation": {
+    "strategy": "dependency_timeout"
+  }
+}

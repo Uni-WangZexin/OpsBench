@@ -11,5 +11,11 @@
     "field": "ip_forward",
     "healthy": "1",
     "faulty": "0"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "ip-forward",
+    "healthy": "1",
+    "faulty": "0"
   }
 }

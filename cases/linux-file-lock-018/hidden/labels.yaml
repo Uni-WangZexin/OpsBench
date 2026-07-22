@@ -1,0 +1,9 @@
+{
+  "domain": "process",
+  "system": "lightweight_linux_container",
+  "difficulty": "medium",
+  "fault_type": "process.stale_file_lock",
+  "symptom": "GET /report always returns busy even though CPU usage is low and the API is otherwise healthy.",
+  "root_cause": "background_worker_holds_report_lock",
+  "expected_fix_type": "in_place_runtime_repair"
+}

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from opsbench.cases import Case, load_case, load_hidden_labels
+from opsbench.kubernetes_cluster import MinikubeClusterManager
 from opsbench.results import append_run
 
 
@@ -20,9 +21,15 @@ class OpsBenchRunError(RuntimeError):
 
 
 class OpsBenchRunner:
-    def __init__(self, use_docker: bool = True, python_executable: str | None = None):
+    def __init__(
+        self,
+        use_docker: bool = True,
+        python_executable: str | None = None,
+        cluster_manager: MinikubeClusterManager | None = None,
+    ):
         self.use_docker = use_docker
         self.python_executable = python_executable or sys.executable
+        self.cluster_manager = cluster_manager or MinikubeClusterManager()
 
     def run(
         self,
@@ -32,6 +39,31 @@ class OpsBenchRunner:
         timeout_sec: int | None = None,
     ) -> dict[str, Any]:
         case = load_case(case_dir)
+        if case.environment_type == "kubernetes":
+            with self.cluster_manager.run_lock():
+                return self._run_case(
+                    case,
+                    agent_path,
+                    results_dir=results_dir,
+                    timeout_sec=timeout_sec,
+                )
+        return self._run_case(
+            case,
+            agent_path,
+            results_dir=results_dir,
+            timeout_sec=timeout_sec,
+        )
+
+    def _run_case(
+        self,
+        case: Case,
+        agent_path: str | Path,
+        results_dir: str | Path,
+        timeout_sec: int | None,
+    ) -> dict[str, Any]:
+        managed_kubeconfig: Path | None = None
+        if case.environment_type == "kubernetes":
+            managed_kubeconfig = self.cluster_manager.ensure()
         agent = Path(agent_path).resolve()
         results_root = Path(results_dir).resolve()
         results_root.mkdir(parents=True, exist_ok=True)
@@ -41,6 +73,8 @@ class OpsBenchRunner:
         run_id = _make_run_id(started_at, case.id, agent_name)
         trace_dir = results_root / "traces" / run_id
         trace_dir.mkdir(parents=True, exist_ok=True)
+        agent_trace_dir = trace_dir / "agent"
+        agent_trace_dir.mkdir(parents=True, exist_ok=True)
         workspace_dir = Path("runtime") / run_id / "workspace"
         workspace_dir = workspace_dir.resolve()
         workspace_dir.mkdir(parents=True, exist_ok=True)
@@ -48,6 +82,13 @@ class OpsBenchRunner:
         compose_project = _compose_project_name(run_id)
         task_file = self._write_task_context(case, workspace_dir)
         env = self._phase_env(case, run_id, compose_project, trace_dir, workspace_dir)
+        env["OPSBENCH_AGENT_SOURCE"] = str(agent.parent)
+        env["OPSBENCH_TASK_SOURCE"] = str(task_file)
+        if managed_kubeconfig is not None:
+            env["KUBECONFIG"] = str(managed_kubeconfig)
+            env["OPSBENCH_OTEL_CHART_ARCHIVE"] = str(
+                self.cluster_manager.chart_archive
+            )
         effective_timeout = timeout_sec or case.agent_timeout_sec
 
         phases: dict[str, dict[str, Any]] = {}
@@ -74,6 +115,9 @@ class OpsBenchRunner:
                 "check_injected", case, trace_dir, env
             )
 
+            agent_env = env.copy()
+            agent_env["OPSBENCH_TRACE_DIR"] = str(agent_trace_dir)
+            agent_env.update(_agent_config_env(env))
             phases["agent"] = self._run_command(
                 "agent",
                 self._agent_command(
@@ -81,12 +125,12 @@ class OpsBenchRunner:
                     agent=agent,
                     task_file=task_file,
                     workspace_dir=workspace_dir,
-                    trace_dir=trace_dir,
+                    trace_dir=agent_trace_dir,
                     timeout_sec=effective_timeout,
                     env=env,
                 ),
                 trace_dir,
-                env,
+                agent_env,
                 timeout=effective_timeout,
                 check=False,
             )
@@ -114,6 +158,8 @@ class OpsBenchRunner:
             and phases.get("check_injected", {}).get("returncode") == 0
         )
         verification_passed = (
+            phases.get("agent", {}).get("returncode") == 0
+            and
             phases.get("verify", {}).get("returncode") == 0
             and verification_result.get("passed") is True
         )
@@ -283,6 +329,7 @@ class OpsBenchRunner:
             "OPSBENCH_RUN_ID": run_id,
             "OPSBENCH_COMPOSE_PROJECT": compose_project,
             "OPSBENCH_TRACE_DIR": str(trace_dir),
+            "OPSBENCH_AGENT_TRACE_DIR": str(trace_dir / "agent"),
             "OPSBENCH_TOOL_STANDARD": case.tool_standard["id"],
             "OPSBENCH_TOOL_COMMANDS": ",".join(case.tool_standard["commands"]),
             "OPSBENCH_AGENT_KUBECONFIG": str(workspace_dir / "agent-kubeconfig.json"),
@@ -319,6 +366,13 @@ def _agent_container_cmd(
     env: dict[str, str],
 ) -> list[str]:
     container_agent = f"/agent/{agent.name}"
+    if case.agent_service:
+        return _agent_service_exec_cmd(
+            case=case,
+            container_agent=container_agent,
+            timeout_sec=timeout_sec,
+            env=env,
+        )
     command = [
         "docker",
         "compose",
@@ -354,6 +408,7 @@ def _agent_container_cmd(
         "-e",
         f"OPSBENCH_TOOL_COMMANDS={','.join(case.tool_standard['commands'])}",
     ]
+    _append_agent_config_env(command, env)
     if case.environment_type == "kubernetes":
         kubeconfig = Path(env["OPSBENCH_AGENT_KUBECONFIG"]).resolve()
         if not kubeconfig.is_file():
@@ -383,6 +438,68 @@ def _agent_container_cmd(
         ]
     )
     return command
+
+
+def _agent_service_exec_cmd(
+    case: Case,
+    container_agent: str,
+    timeout_sec: int,
+    env: dict[str, str],
+) -> list[str]:
+    command = [
+        "docker",
+        "compose",
+        "-p",
+        env["OPSBENCH_COMPOSE_PROJECT"],
+        "-f",
+        str(case.compose_file),
+        "exec",
+        "-T",
+    ]
+    runtime_env = {
+        "OPSBENCH_AGENT_CONTAINER": "1",
+        "OPSBENCH_CASE_ID": env.get("OPSBENCH_CASE_ID", ""),
+        "OPSBENCH_RUN_ID": env.get("OPSBENCH_RUN_ID", ""),
+        "OPSBENCH_TRACE_DIR": "/trace",
+        "OPSBENCH_SHELL_SERVICE": case.services[0] if case.services else "",
+        "OPSBENCH_NAMESPACE": env.get("OPSBENCH_NAMESPACE", ""),
+        "OPSBENCH_TOOL_STANDARD": case.tool_standard["id"],
+        "OPSBENCH_TOOL_COMMANDS": ",".join(case.tool_standard["commands"]),
+    }
+    for key, value in runtime_env.items():
+        command.extend(["-e", f"{key}={value}"])
+    _append_agent_config_env(command, env)
+    command.extend(
+        [
+            case.agent_service,
+            container_agent,
+            "--case-dir",
+            "/case",
+            "--task",
+            "/task/task.md",
+            "--work-dir",
+            "/tmp/agent-work",
+            "--timeout-sec",
+            str(timeout_sec),
+        ]
+    )
+    return command
+
+
+def _append_agent_config_env(command: list[str], env: dict[str, str]) -> None:
+    for key in _agent_config_env(env):
+        command.extend(["-e", key])
+
+
+def _agent_config_env(env: dict[str, str]) -> dict[str, str]:
+    defaults = {
+        "DEEPSEEK_API_KEY": "",
+        "DEEPSEEK_BASE_URL": "https://api.deepseek.com",
+        "DEEPSEEK_MODEL": "deepseek-v4-pro",
+        "LANGCHAIN_MAX_STEPS": "60",
+        "LANGCHAIN_TEMPERATURE": "0",
+    }
+    return {key: env.get(key, default) for key, default in defaults.items()}
 
 
 def _parse_last_json_object(output: str) -> dict[str, Any]:

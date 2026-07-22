@@ -11,5 +11,11 @@
     "field": "ssl_redirect",
     "healthy": "true",
     "faulty": "false"
+  },
+  "implementation": {
+    "strategy": "ingress",
+    "fault": "ssl_redirect",
+    "healthy": "true",
+    "faulty": "false"
   }
 }

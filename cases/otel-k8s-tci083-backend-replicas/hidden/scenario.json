@@ -11,5 +11,12 @@
     "field": "backend_replicas",
     "healthy": "2",
     "faulty": "0"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "checkoutservice",
+    "fault": "replicas",
+    "healthy": 1,
+    "faulty": 0
   }
 }

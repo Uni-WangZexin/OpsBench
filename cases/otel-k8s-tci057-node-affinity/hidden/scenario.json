@@ -11,5 +11,10 @@
     "field": "node_affinity",
     "healthy": "satisfiable",
     "faulty": "unsatisfiable"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "frontend",
+    "fault": "node_selector"
   }
 }

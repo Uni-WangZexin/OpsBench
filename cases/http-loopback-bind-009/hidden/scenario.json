@@ -1,0 +1,6 @@
+{
+  "case_id": "http-loopback-bind-009",
+  "implementation": {
+    "strategy": "loopback_bind"
+  }
+}

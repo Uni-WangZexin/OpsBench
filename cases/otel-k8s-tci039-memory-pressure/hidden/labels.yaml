@@ -7,5 +7,5 @@
   "fault_type": "memory_pressure",
   "root_cause": "内存过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:workload_stress"
 }

@@ -1,0 +1,9 @@
+{
+  "domain": "configuration",
+  "system": "lightweight_linux_container",
+  "difficulty": "low",
+  "fault_type": "configuration.invalid_json",
+  "symptom": "The target container remains running, but the HTTP application exits during startup.",
+  "root_cause": "runtime_configuration_is_malformed",
+  "expected_fix_type": "in_place_runtime_repair"
+}

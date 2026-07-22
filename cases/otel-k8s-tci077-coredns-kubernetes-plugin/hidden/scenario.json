@@ -11,5 +11,11 @@
     "field": "coredns_kubernetes_plugin",
     "healthy": "enabled",
     "faulty": "removed"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "coredns-kubernetes-plugin",
+    "healthy": "enabled",
+    "faulty": "removed"
   }
 }

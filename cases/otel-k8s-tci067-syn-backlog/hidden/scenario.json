@@ -11,5 +11,10 @@
     "field": "syn_backlog",
     "healthy": "normal",
     "faulty": "flooded"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "connections",
+    "target": "frontendproxy"
   }
 }

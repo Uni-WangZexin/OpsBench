@@ -7,5 +7,5 @@
   "fault_type": "upstream_retries",
   "root_cause": "配置错误的重试策略（过低的重试次数）",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Ingress"
+  "injection": "kubernetes-real:config_probe"
 }

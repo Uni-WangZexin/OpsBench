@@ -1,0 +1,9 @@
+{
+  "domain": "process",
+  "system": "lightweight_linux_container",
+  "difficulty": "low",
+  "fault_type": "process.stale_pid_file",
+  "symptom": "The API is down and its service control command refuses to start a replacement process.",
+  "root_cause": "stale_pid_file_blocks_startup",
+  "expected_fix_type": "in_place_runtime_repair"
+}

@@ -1,0 +1,6 @@
+{
+  "case_id": "tls-hostname-mismatch-020",
+  "implementation": {
+    "strategy": "tls_hostname"
+  }
+}

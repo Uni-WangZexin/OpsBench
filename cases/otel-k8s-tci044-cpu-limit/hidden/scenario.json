@@ -11,5 +11,12 @@
     "field": "cpu_limit",
     "healthy": "500m",
     "faulty": "100m"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "productcatalogservice",
+    "fault": "cpu_limit",
+    "healthy": "500m",
+    "faulty": "100m"
   }
 }

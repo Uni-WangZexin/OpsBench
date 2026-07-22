@@ -11,5 +11,10 @@
     "field": "egress_bandwidth",
     "healthy": "normal",
     "faulty": "saturated"
+  },
+  "implementation": {
+    "strategy": "proxy",
+    "component": "frontendproxy",
+    "mode": "bandwidth"
   }
 }

@@ -1,0 +1,9 @@
+{
+  "domain": "filesystem",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "filesystem.capacity_exhausted",
+  "symptom": "The API is healthy for reads, but new uploads fail with an insufficient-storage response.",
+  "root_cause": "unexpected_archive_consumes_data_volume",
+  "expected_fix_type": "in_place_runtime_repair"
+}

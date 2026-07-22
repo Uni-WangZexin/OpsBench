@@ -7,5 +7,5 @@
   "fault_type": "backend_memory_limit",
   "root_cause": "注入Pod资源超限",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

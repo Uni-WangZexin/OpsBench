@@ -11,5 +11,9 @@
     "field": "volume_zone",
     "healthy": "same-zone",
     "faulty": "cross-zone"
+  },
+  "implementation": {
+    "strategy": "pending",
+    "fault": "volume_zone"
   }
 }

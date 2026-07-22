@@ -7,5 +7,5 @@
   "fault_type": "listen_port",
   "root_cause": "端口未监听",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:service"
 }

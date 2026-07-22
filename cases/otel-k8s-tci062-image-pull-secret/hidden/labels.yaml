@@ -7,5 +7,5 @@
   "fault_type": "image_pull_secret",
   "root_cause": "密钥错误",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Secret"
+  "injection": "kubernetes-real:pull_secret"
 }

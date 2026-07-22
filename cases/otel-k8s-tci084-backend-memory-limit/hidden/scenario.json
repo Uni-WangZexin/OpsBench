@@ -11,5 +11,12 @@
     "field": "backend_memory_limit",
     "healthy": "256Mi",
     "faulty": "10Mi"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "checkoutservice",
+    "fault": "memory_limit",
+    "healthy": "128Mi",
+    "faulty": "10Mi"
   }
 }

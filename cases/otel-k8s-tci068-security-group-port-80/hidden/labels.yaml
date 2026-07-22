@@ -7,5 +7,5 @@
   "fault_type": "security_group_port_80",
   "root_cause": "修改安全组规则（模拟误操作）",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:CloudSecurityGroup"
+  "injection": "kubernetes-real:network_policy"
 }

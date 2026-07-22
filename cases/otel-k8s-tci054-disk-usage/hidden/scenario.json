@@ -11,5 +11,10 @@
     "field": "disk_usage",
     "healthy": "45%",
     "faulty": "100%"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "disk_fill",
+    "target": "node"
   }
 }

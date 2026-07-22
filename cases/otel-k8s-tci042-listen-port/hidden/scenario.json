@@ -11,5 +11,12 @@
     "field": "listen_port",
     "healthy": "8080",
     "faulty": "closed"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "frontendproxy",
+    "fault": "target_port",
+    "healthy": 8080,
+    "faulty": 65535
   }
 }

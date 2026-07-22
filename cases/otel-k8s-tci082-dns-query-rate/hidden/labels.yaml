@@ -7,5 +7,5 @@
   "fault_type": "dns_query_rate",
   "root_cause": "注入高负载流量",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Job"
+  "injection": "kubernetes-real:stress"
 }

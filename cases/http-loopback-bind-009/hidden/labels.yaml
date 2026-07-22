@@ -1,0 +1,9 @@
+{
+  "domain": "network",
+  "system": "lightweight_linux_container",
+  "difficulty": "medium",
+  "fault_type": "network.loopback_only_bind",
+  "symptom": "The service responds inside the target host but peer containers cannot reach it on port 8080.",
+  "root_cause": "application_bound_to_127_0_0_1",
+  "expected_fix_type": "in_place_runtime_repair"
+}

@@ -11,5 +11,12 @@
     "field": "service_selector",
     "healthy": "matched",
     "faulty": "missing"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "frontend",
+    "fault": "selector",
+    "healthy": "frontend",
+    "faulty": "missing-backend"
   }
 }

@@ -1,0 +1,90 @@
+# Stable resource floor for the v0.11.0 Demo chart on current container runtimes.
+observability:
+  jaeger:
+    image:
+      repository: jaegertracing/all-in-one
+      tag: "1.39"
+      pullPolicy: IfNotPresent
+
+components:
+  redis:
+    resources:
+      limits:
+        memory: 64Mi
+  checkoutService:
+    resources:
+      limits:
+        memory: 128Mi
+  currencyService:
+    resources:
+      limits:
+        memory: 128Mi
+  emailService:
+    resources:
+      limits:
+        memory: 192Mi
+  featureflagService:
+    podAnnotations:
+      demo.open-telemetry.io/baseline-known-issue: amd64-image-on-arm64
+    resources:
+      limits:
+        memory: 256Mi
+  ffsPostgres:
+    resources:
+      limits:
+        memory: 256Mi
+  frontend:
+    resources:
+      limits:
+        memory: 512Mi
+  frontendProxy:
+    resources:
+      limits:
+        memory: 128Mi
+  paymentService:
+    resources:
+      limits:
+        memory: 256Mi
+  productCatalogService:
+    resources:
+      limits:
+        memory: 128Mi
+  shippingService:
+    resources:
+      limits:
+        memory: 128Mi
+  quoteService:
+    resources:
+      limits:
+        memory: 128Mi
+
+opentelemetry-collector:
+  resources:
+    limits:
+      memory: 256Mi
+
+# Prometheus already stores application and span metrics. This additional job
+# exposes real per-container CPU, memory, filesystem, and network usage from
+# kubelet/cAdvisor to both agents and hidden verification.
+prometheus:
+  serverFiles:
+    prometheus.yml:
+      scrape_configs:
+        - job_name: opentelemetry-community-demo
+          kubernetes_sd_configs:
+            - role: pod
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_annotation_opentelemetry_community_demo]
+              action: keep
+              regex: true
+        - job_name: kubernetes-cadvisor
+          scheme: https
+          metrics_path: /metrics/cadvisor
+          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          tls_config:
+            insecure_skip_verify: true
+          kubernetes_sd_configs:
+            - role: node
+          relabel_configs:
+            - action: labelmap
+              regex: __meta_kubernetes_node_label_(.+)

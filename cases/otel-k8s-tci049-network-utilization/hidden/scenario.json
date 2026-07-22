@@ -11,5 +11,10 @@
     "field": "network_utilization",
     "healthy": "normal",
     "faulty": "saturated"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "network",
+    "target": "frontendproxy"
   }
 }

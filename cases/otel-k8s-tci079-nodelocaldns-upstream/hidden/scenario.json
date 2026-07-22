@@ -11,5 +11,11 @@
     "field": "nodelocaldns_upstream",
     "healthy": "kube-dns",
     "faulty": "127.0.0.1:9999"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "dns-upstream",
+    "healthy": "kube-dns",
+    "faulty": "127.0.0.1:9999"
   }
 }

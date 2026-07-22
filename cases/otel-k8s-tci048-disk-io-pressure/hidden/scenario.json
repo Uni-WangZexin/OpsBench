@@ -11,5 +11,10 @@
     "field": "disk_io_pressure",
     "healthy": "false",
     "faulty": "true"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "io",
+    "target": "node"
   }
 }

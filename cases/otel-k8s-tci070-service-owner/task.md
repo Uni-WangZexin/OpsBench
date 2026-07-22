@@ -15,4 +15,4 @@ control files. Make the smallest in-place repair and summarize your evidence.
 ## Success Criteria
 
 The benchmark independently checks that the namespace remains available and
-that the injected resource state has been repaired.
+that the real injected fault and its workload impact have been repaired.

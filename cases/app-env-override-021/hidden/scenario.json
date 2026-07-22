@@ -1,0 +1,6 @@
+{
+  "case_id": "app-env-override-021",
+  "implementation": {
+    "strategy": "environment_override"
+  }
+}

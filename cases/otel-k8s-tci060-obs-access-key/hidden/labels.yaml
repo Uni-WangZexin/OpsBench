@@ -7,5 +7,5 @@
   "fault_type": "obs_access_key",
   "root_cause": "OBS密钥错误",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Secret"
+  "injection": "kubernetes-real:config_probe"
 }

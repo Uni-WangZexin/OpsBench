@@ -1,0 +1,9 @@
+{
+  "domain": "linux",
+  "system": "lightweight_linux_container",
+  "difficulty": "medium",
+  "fault_type": "resource.cpu_runaway",
+  "symptom": "The target host has sustained CPU saturation and routine API checks have become inconsistent.",
+  "root_cause": "unbounded_background_compute_worker",
+  "expected_fix_type": "in_place_runtime_repair"
+}

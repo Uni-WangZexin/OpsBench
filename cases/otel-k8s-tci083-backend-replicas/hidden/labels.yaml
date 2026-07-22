@@ -7,5 +7,5 @@
   "fault_type": "backend_replicas",
   "root_cause": "模拟后端服务不可用",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

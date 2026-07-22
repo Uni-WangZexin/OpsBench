@@ -1,0 +1,9 @@
+{
+  "domain": "filesystem",
+  "system": "lightweight_linux_container",
+  "difficulty": "medium",
+  "fault_type": "filesystem.inode_exhausted",
+  "symptom": "The data volume still has byte capacity, but the service cannot create new upload files.",
+  "root_cause": "cache_contains_excessive_small_files",
+  "expected_fix_type": "in_place_runtime_repair"
+}

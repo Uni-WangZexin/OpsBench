@@ -11,5 +11,9 @@
     "field": "image_pull_secret",
     "healthy": "valid",
     "faulty": "invalid"
+  },
+  "implementation": {
+    "strategy": "pull_secret",
+    "component": "frontend"
   }
 }

@@ -11,5 +11,11 @@
     "field": "controller_config",
     "healthy": "valid",
     "faulty": "invalid"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "controller-config",
+    "healthy": "valid",
+    "faulty": "invalid"
   }
 }

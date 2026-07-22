@@ -7,5 +7,5 @@
   "fault_type": "kubelet_state",
   "root_cause": "手动停止组件",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:node"
 }

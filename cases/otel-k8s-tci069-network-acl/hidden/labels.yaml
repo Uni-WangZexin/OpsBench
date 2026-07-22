@@ -7,5 +7,5 @@
   "fault_type": "network_acl",
   "root_cause": "修改ACL规则（模拟误操作）",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:CloudNetworkACL"
+  "injection": "kubernetes-real:network_policy"
 }

@@ -7,5 +7,5 @@
   "fault_type": "nodelocaldns_upstream",
   "root_cause": "修改NodeLocal DNS缓存配置",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:ConfigMap"
+  "injection": "kubernetes-real:config_probe"
 }

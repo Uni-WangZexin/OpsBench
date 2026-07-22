@@ -11,5 +11,12 @@
     "field": "backend_service",
     "healthy": "present",
     "faulty": "deleted"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "checkoutservice",
+    "fault": "delete",
+    "healthy": "present",
+    "faulty": "deleted"
   }
 }

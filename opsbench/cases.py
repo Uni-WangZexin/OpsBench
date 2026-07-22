@@ -20,6 +20,7 @@ class Case:
     compose_file: Path
     environment_type: str
     services: list[str]
+    agent_service: str
     scripts: dict[str, Path]
     task_file: Path
     hidden_metadata: Path
@@ -115,6 +116,7 @@ def load_case(case_dir: str | Path) -> Case:
         compose_file=compose_file,
         environment_type=environment_type,
         services=list(environment.get("services", [])),
+        agent_service=str(environment.get("agent_service", "")),
         scripts=script_paths,
         task_file=task_file,
         hidden_metadata=hidden_metadata,

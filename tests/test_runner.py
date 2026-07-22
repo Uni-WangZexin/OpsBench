@@ -42,8 +42,8 @@ class RunnerTests(unittest.TestCase):
                 },
             )
             trace_dir = root / record["trace_dir"]
-            self.assertTrue((trace_dir / "agent-trace.md").exists())
-            trace = (trace_dir / "agent-trace.md").read_text(encoding="utf-8")
+            self.assertTrue((trace_dir / "agent" / "agent-trace.md").exists())
+            trace = (trace_dir / "agent" / "agent-trace.md").read_text(encoding="utf-8")
             self.assertIn("Shell service: db", trace)
             self.assertTrue((results_dir / "runs.jsonl").exists())
 
@@ -83,6 +83,24 @@ class RunnerTests(unittest.TestCase):
             recorded = json.loads((results_dir / "runs.jsonl").read_text(encoding="utf-8"))
             self.assertEqual(recorded["run_id"], record["run_id"])
 
+    def test_agent_failure_cannot_score_even_when_environment_is_repaired(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            case_dir = self._write_fake_case(root, verify_passed=True)
+            agent_path = self._write_fake_agent(root, exit_code=1)
+
+            record = OpsBenchRunner(use_docker=False).run(
+                case_dir=case_dir,
+                agent_path=agent_path,
+                results_dir=root / "results",
+                timeout_sec=20,
+            )
+
+            self.assertEqual(record["phases"]["agent"]["returncode"], 1)
+            self.assertTrue(record["verification"]["passed"])
+            self.assertFalse(record["verification_passed"])
+            self.assertEqual(record["score"], 0.0)
+
     def test_docker_runner_executes_agent_inside_agent_runner_container(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -101,6 +119,7 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(record["verification_passed"])
             agent_command = runner.commands["agent"]
             trace_dir = root / record["trace_dir"]
+            agent_trace_dir = trace_dir / "agent"
             workspace_dir = Path("runtime") / record["run_id"] / "workspace"
             workspace_dir = workspace_dir.resolve()
             self.assertEqual(agent_command[0:5], ["docker", "compose", "-p", runner.compose_project, "-f"])
@@ -112,9 +131,14 @@ class RunnerTests(unittest.TestCase):
             self.assertIn("agent-runner", agent_command)
             self.assertIn(f"{agent_path.parent.resolve()}:/agent:ro", agent_command)
             self.assertIn(f"{workspace_dir / 'task.md'}:/task/task.md:ro", agent_command)
-            self.assertIn(f"{trace_dir.resolve()}:/trace", agent_command)
+            self.assertIn(f"{agent_trace_dir.resolve()}:/trace", agent_command)
+            self.assertNotIn(f"{trace_dir.resolve()}:/trace", agent_command)
             self.assertIn("OPSBENCH_AGENT_CONTAINER=1", agent_command)
             self.assertIn("OPSBENCH_TRACE_DIR=/trace", agent_command)
+            self.assertIn("DEEPSEEK_API_KEY", agent_command)
+            self.assertFalse(
+                any(part.startswith("DEEPSEEK_API_KEY=") for part in agent_command)
+            )
             self.assertFalse(any("OPSBENCH_VERIFY_CMD" in part for part in agent_command))
 
             service_index = agent_command.index("agent-runner")
@@ -133,7 +157,38 @@ class RunnerTests(unittest.TestCase):
                 ],
             )
 
-    def _write_fake_case(self, root: Path, verify_passed: bool = True) -> Path:
+    def test_docker_runner_executes_agent_inside_target_service(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            case_dir = self._write_fake_case(root, agent_service="target")
+            agent_path = self._write_fake_agent(root)
+            runner = _RecordingDockerRunner()
+
+            runner.run(
+                case_dir=case_dir,
+                agent_path=agent_path,
+                results_dir=root / "results",
+                timeout_sec=20,
+            )
+
+            command = runner.commands["agent"]
+            self.assertIn("exec", command)
+            self.assertNotIn("run", command)
+            self.assertNotIn("agent-runner", command)
+            self.assertNotIn("sshpass", command)
+            service_index = command.index("target")
+            self.assertEqual(command[service_index + 1], "/agent/run.sh")
+            self.assertIn("OPSBENCH_AGENT_CONTAINER=1", command)
+            self.assertIn("OPSBENCH_TRACE_DIR=/trace", command)
+            self.assertIn("DEEPSEEK_API_KEY", command)
+            self.assertFalse(any(part.startswith("DEEPSEEK_API_KEY=") for part in command))
+
+    def _write_fake_case(
+        self,
+        root: Path,
+        verify_passed: bool = True,
+        agent_service: str = "",
+    ) -> Path:
         case_dir = root / "cases" / "fake-case"
         scripts_dir = case_dir / "scripts"
         hidden_dir = case_dir / "hidden"
@@ -147,6 +202,7 @@ class RunnerTests(unittest.TestCase):
                     "environment": {
                         "compose_file": "docker-compose.yaml",
                         "services": ["db"],
+                        "agent_service": agent_service,
                     },
                     "scripts": {
                         "inject": "scripts/inject.py",
@@ -239,7 +295,7 @@ class RunnerTests(unittest.TestCase):
         )
         return case_dir
 
-    def _write_fake_agent(self, root: Path) -> Path:
+    def _write_fake_agent(self, root: Path, exit_code: int = 0) -> Path:
         agent_dir = root / "agents" / "fake-agent"
         agent_dir.mkdir(parents=True)
         run_sh = agent_dir / "run.sh"
@@ -268,8 +324,9 @@ class RunnerTests(unittest.TestCase):
                   echo "fake agent read task"
                   echo "Shell service: ${OPSBENCH_SHELL_SERVICE:-}"
                 } > "$OPSBENCH_TRACE_DIR/agent-trace.md"
+                exit EXIT_CODE
                 """
-            ),
+            ).replace("EXIT_CODE", str(exit_code)),
             encoding="utf-8",
         )
         run_sh.chmod(run_sh.stat().st_mode | stat.S_IXUSR)

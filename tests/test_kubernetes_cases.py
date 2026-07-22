@@ -24,6 +24,26 @@ def load_kubernetes_common():
 
 
 class KubernetesCaseTests(unittest.TestCase):
+    def test_loopback_cluster_endpoint_is_reachable_from_agent_container(self):
+        common = load_kubernetes_common()
+
+        cluster = common.agent_reachable_cluster(
+            {
+                "server": "https://127.0.0.1:53241",
+                "certificate-authority-data": "Y2E=",
+            }
+        )
+
+        self.assertEqual(cluster["server"], "https://host.docker.internal:53241")
+        self.assertEqual(cluster["tls-server-name"], "127.0.0.1")
+        self.assertEqual(cluster["certificate-authority-data"], "Y2E=")
+
+    def test_remote_cluster_endpoint_is_unchanged(self):
+        common = load_kubernetes_common()
+        source = {"server": "https://cluster.example:6443"}
+
+        self.assertEqual(common.agent_reachable_cluster(source), source)
+
     def test_restricted_kubeconfig_is_namespace_scoped_and_uses_short_lived_token(self):
         common = load_kubernetes_common()
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -85,6 +105,13 @@ class KubernetesCaseTests(unittest.TestCase):
                     for rule in role["rules"]
                 )
             )
+            cluster_role = next(
+                item
+                for item in applied_manifests[1]["items"]
+                if item["kind"] == "ClusterRole"
+            )
+            self.assertEqual(cluster_role["rules"][0]["resources"], ["nodes"])
+            self.assertNotIn("delete", cluster_role["rules"][0]["verbs"])
 
     def test_kubernetes_agent_mounts_no_case_or_admin_kubeconfig(self):
         case = load_case(ROOT / "cases" / "otel-k8s-tci061-image-reference")

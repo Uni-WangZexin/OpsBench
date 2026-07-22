@@ -11,5 +11,10 @@
     "field": "dns_ingress",
     "healthy": "allowed",
     "faulty": "denied"
+  },
+  "implementation": {
+    "strategy": "network_policy",
+    "component": "otelcol",
+    "fault": "deny_ingress"
   }
 }

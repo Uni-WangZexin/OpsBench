@@ -11,5 +11,10 @@
     "field": "controller_image",
     "healthy": "valid",
     "faulty": "invalid"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "frontendproxy",
+    "fault": "image"
   }
 }

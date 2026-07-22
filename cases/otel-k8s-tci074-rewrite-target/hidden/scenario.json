@@ -11,5 +11,11 @@
     "field": "rewrite_target",
     "healthy": "/",
     "faulty": "/invalid-path"
+  },
+  "implementation": {
+    "strategy": "ingress",
+    "fault": "path",
+    "healthy": "/",
+    "faulty": "/invalid-path"
   }
 }

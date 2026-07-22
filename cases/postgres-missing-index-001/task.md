@@ -11,7 +11,9 @@ Diagnose the live database and apply the smallest database repair needed. The be
 - Database user: `opsbench`
 - Database password: `opsbench`
 - The agent runs in an isolated container on the same network as the database.
-- Inspect and repair PostgreSQL from that container with:
+- Structured database inspection, SQL execution, and EXPLAIN tools are
+  available. The `psql` client remains available through the audited shell
+  fallback:
 
 ```bash
 psql -h db -U opsbench -d opsbench

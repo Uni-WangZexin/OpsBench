@@ -7,5 +7,5 @@
   "fault_type": "cpu_limit",
   "root_cause": "CPU limits",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

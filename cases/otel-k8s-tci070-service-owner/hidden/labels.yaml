@@ -7,5 +7,5 @@
   "fault_type": "service_owner",
   "root_cause": "恶意创建同名Service",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:service"
 }

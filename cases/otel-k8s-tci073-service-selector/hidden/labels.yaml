@@ -7,5 +7,5 @@
   "fault_type": "service_selector",
   "root_cause": "删除后端Service的Selector标签",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:service"
 }

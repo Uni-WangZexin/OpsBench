@@ -11,5 +11,10 @@
     "field": "conntrack_capacity",
     "healthy": "available",
     "faulty": "exhausted"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "connections",
+    "target": "frontendproxy"
   }
 }

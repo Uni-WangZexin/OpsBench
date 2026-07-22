@@ -11,5 +11,10 @@
     "field": "node_network",
     "healthy": "reachable",
     "faulty": "unreachable"
+  },
+  "implementation": {
+    "strategy": "node",
+    "fault": "taint",
+    "key": "opsbench.io/network-unreachable"
   }
 }

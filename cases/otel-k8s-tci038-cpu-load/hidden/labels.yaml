@@ -7,5 +7,5 @@
   "fault_type": "cpu_load",
   "root_cause": "CPU过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:workload_stress"
 }

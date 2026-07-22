@@ -11,5 +11,12 @@
     "field": "service_owner",
     "healthy": "expected",
     "faulty": "shadowed"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "checkoutservice",
+    "fault": "selector",
+    "healthy": "checkoutservice",
+    "faulty": "shadow-backend"
   }
 }

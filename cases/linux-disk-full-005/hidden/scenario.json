@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-disk-full-005",
+  "implementation": {
+    "strategy": "disk_full"
+  }
+}

@@ -7,5 +7,5 @@
   "fault_type": "conntrack_capacity",
   "root_cause": "模拟短连接洪水",
   "difficulty": "Advanced",
-  "simulation": "kubernetes-state:Pod"
+  "injection": "kubernetes-real:stress"
 }

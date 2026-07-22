@@ -20,9 +20,89 @@ def create_langchain_tools(context: ToolContext) -> list[object]:
 
     @tool
     def shell(command: str) -> str:
-        """Run a shell command inside the agent container."""
+        """Run an expert fallback shell command in the Agent environment."""
 
         return _tool_result(lambda: tools["shell"](command))
+
+    @tool
+    def read_logs(path: str = "", query: str = "", tail: int = 200) -> str:
+        """List log files or read and filter a log under /var/log."""
+
+        return _tool_result(lambda: tools["read_logs"](path, query, tail))
+
+    @tool
+    def inspect_processes(query: str = "", limit: int = 50) -> str:
+        """Inspect processes with PID, owner, CPU, memory, age, and command."""
+
+        return _tool_result(lambda: tools["inspect_processes"](query, limit))
+
+    @tool
+    def inspect_sockets(port: int = 0, listening: bool = True) -> str:
+        """Inspect TCP/UDP sockets, optionally filtering one port."""
+
+        return _tool_result(lambda: tools["inspect_sockets"](port, listening))
+
+    @tool
+    def query_host_metrics(pid: int = 0, sample_seconds: float = 1.0) -> str:
+        """Read host memory/load or sample one process's CPU, RSS, threads, and FDs."""
+
+        return _tool_result(lambda: tools["query_host_metrics"](pid, sample_seconds))
+
+    @tool
+    def inspect_filesystem(path: str = "/") -> str:
+        """Inspect byte/inode usage, largest children, and deleted open files."""
+
+        return _tool_result(lambda: tools["inspect_filesystem"](path))
+
+    @tool
+    def probe_http(
+        url: str,
+        method: str = "GET",
+        body: str = "",
+        timeout_sec: int = 5,
+        ca_file: str = "",
+    ) -> str:
+        """Probe HTTP/HTTPS and report body, status, latency, address, and TLS result."""
+
+        return _tool_result(
+            lambda: tools["probe_http"](url, method, body, timeout_sec, ca_file)
+        )
+
+    @tool
+    def inspect_file(path: str, max_bytes: int = 4000) -> str:
+        """Inspect file metadata and a bounded text preview."""
+
+        return _tool_result(lambda: tools["inspect_file"](path, max_bytes))
+
+    @tool
+    def edit_file(path: str, old_text: str, new_text: str) -> str:
+        """Apply one exact text replacement to a runtime configuration file."""
+
+        return _tool_result(lambda: tools["edit_file"](path, old_text, new_text))
+
+    @tool
+    def manage_service(service: str, action: str) -> str:
+        """List or start, stop, restart, and inspect a managed service."""
+
+        return _tool_result(lambda: tools["manage_service"](service, action))
+
+    @tool
+    def inspect_database(scope: str = "overview", relation: str = "") -> str:
+        """Inspect PostgreSQL overview, tables, indexes, activity, stats, or settings."""
+
+        return _tool_result(lambda: tools["inspect_database"](scope, relation))
+
+    @tool
+    def query_database(sql: str) -> str:
+        """Execute SQL against the configured PostgreSQL database, including repairs."""
+
+        return _tool_result(lambda: tools["query_database"](sql))
+
+    @tool
+    def explain_query(sql: str, analyze: bool = False) -> str:
+        """Run PostgreSQL EXPLAIN JSON for a SELECT/WITH query, optionally ANALYZE."""
+
+        return _tool_result(lambda: tools["explain_query"](sql, analyze))
 
     @tool
     def kubectl_logs(
@@ -80,6 +160,18 @@ def create_langchain_tools(context: ToolContext) -> list[object]:
 
     adapters = {
         "shell": shell,
+        "read_logs": read_logs,
+        "inspect_processes": inspect_processes,
+        "inspect_sockets": inspect_sockets,
+        "query_host_metrics": query_host_metrics,
+        "inspect_filesystem": inspect_filesystem,
+        "probe_http": probe_http,
+        "inspect_file": inspect_file,
+        "edit_file": edit_file,
+        "manage_service": manage_service,
+        "inspect_database": inspect_database,
+        "query_database": query_database,
+        "explain_query": explain_query,
         "kubectl_logs": kubectl_logs,
         "list_metrics": list_metrics,
         "query_metrics": query_metrics,

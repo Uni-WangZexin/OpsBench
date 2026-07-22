@@ -7,5 +7,5 @@
   "fault_type": "service_port",
   "root_cause": "通过K8s Service覆盖ELB配置",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:service"
 }

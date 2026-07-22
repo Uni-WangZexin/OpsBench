@@ -7,5 +7,5 @@
   "fault_type": "cpu_pressure",
   "root_cause": "CPU过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:stress"
 }

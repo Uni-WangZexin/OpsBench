@@ -7,5 +7,5 @@
   "fault_type": "disk_io_pressure",
   "root_cause": "磁盘IO过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:stress"
 }

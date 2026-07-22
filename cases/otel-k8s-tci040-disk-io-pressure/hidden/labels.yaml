@@ -7,5 +7,5 @@
   "fault_type": "disk_io_pressure",
   "root_cause": "磁盘过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Pod"
+  "injection": "kubernetes-real:workload_stress"
 }

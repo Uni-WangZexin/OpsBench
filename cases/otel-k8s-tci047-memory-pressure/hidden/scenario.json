@@ -11,5 +11,13 @@
     "field": "memory_pressure",
     "healthy": "false",
     "faulty": "true"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "memory",
+    "target": "node",
+    "memory_mib": 1280,
+    "active_threshold": 1073741824,
+    "recovery_threshold": 134217728
   }
 }

@@ -7,5 +7,5 @@
   "fault_type": "session_affinity",
   "root_cause": "关闭Ingress的affinity配置",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Ingress"
+  "injection": "kubernetes-real:service"
 }

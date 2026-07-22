@@ -11,5 +11,12 @@
     "field": "memory_pressure",
     "healthy": "normal",
     "faulty": "exhausted"
+  },
+  "implementation": {
+    "strategy": "workload_stress",
+    "mode": "memory",
+    "component": "frontend",
+    "active_threshold": 367001600,
+    "recovery_threshold": 314572800
   }
 }

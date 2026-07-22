@@ -5,6 +5,7 @@ from pathlib import Path
 
 from opsbench.cases import load_case
 from opsbench.leaderboard import format_leaderboard, summarize_runs
+from opsbench.kubernetes_cluster import MinikubeClusterManager
 from opsbench.results import load_runs
 from opsbench.runner import OpsBenchRunner
 
@@ -25,6 +26,9 @@ def main(argv: list[str] | None = None) -> int:
 
     leaderboard_parser = subparsers.add_parser("leaderboard")
     leaderboard_parser.add_argument("--results", default="results/runs.jsonl")
+
+    cluster_parser = subparsers.add_parser("cluster")
+    cluster_parser.add_argument("action", choices=("up", "status", "down"))
 
     args = parser.parse_args(argv)
 
@@ -50,6 +54,23 @@ def main(argv: list[str] | None = None) -> int:
         runs = load_runs(args.results)
         print(format_leaderboard(summarize_runs(runs)))
         return 0
+
+    if args.command == "cluster":
+        manager = MinikubeClusterManager()
+        if args.action == "up":
+            kubeconfig = manager.ensure()
+            print(f"RUNNING {manager.profile}")
+            print(f"kubeconfig: {kubeconfig}")
+            return 0
+        if args.action == "down":
+            manager.delete()
+            print(f"DELETED {manager.profile}")
+            return 0
+        status = manager.status()
+        state = "RUNNING" if status.running else "STOPPED"
+        print(f"{state} {status.profile}")
+        print(f"kubeconfig: {status.kubeconfig}")
+        return 0 if status.running else 1
 
     parser.error(f"unknown command: {args.command}")
     return 2

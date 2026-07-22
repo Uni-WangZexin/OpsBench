@@ -11,5 +11,9 @@
     "field": "kubelet_state",
     "healthy": "running",
     "faulty": "stopped"
+  },
+  "implementation": {
+    "strategy": "node",
+    "fault": "cordon"
   }
 }

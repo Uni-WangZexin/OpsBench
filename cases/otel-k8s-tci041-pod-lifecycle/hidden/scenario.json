@@ -11,5 +11,10 @@
     "field": "pod_lifecycle",
     "healthy": "stable",
     "faulty": "forced-restart"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "checkoutservice",
+    "fault": "crash"
   }
 }

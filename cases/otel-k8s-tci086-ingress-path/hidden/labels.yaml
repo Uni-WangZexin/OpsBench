@@ -7,5 +7,5 @@
   "fault_type": "ingress_path",
   "root_cause": "错误配置路径规则",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Ingress"
+  "injection": "kubernetes-real:ingress"
 }

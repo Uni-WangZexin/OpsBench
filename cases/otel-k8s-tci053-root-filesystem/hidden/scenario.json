@@ -11,5 +11,10 @@
     "field": "root_filesystem",
     "healthy": "writable",
     "faulty": "read-only"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "frontend",
+    "fault": "read_only_root"
   }
 }

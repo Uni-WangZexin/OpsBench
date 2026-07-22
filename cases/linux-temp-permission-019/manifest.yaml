@@ -1,0 +1,56 @@
+{
+  "id": "linux-temp-permission-019",
+  "domain": "filesystem",
+  "environment": {
+    "type": "compose",
+    "compose_file": "docker-compose.yaml",
+    "services": [
+      "target"
+    ],
+    "agent_service": "target",
+    "baseline": {
+      "image_family": "python:3.12-slim-bookworm",
+      "target_cpu": "1.00",
+      "target_memory": "384MiB",
+      "data_tmpfs": "24MiB"
+    }
+  },
+  "scripts": {
+    "inject": "scripts/inject.py",
+    "check_injected": "scripts/check_injected.py",
+    "verify": "scripts/verify.py"
+  },
+  "task": "task.md",
+  "hidden_metadata": "hidden/labels.yaml",
+  "tool_standard": {
+    "id": "linux-operations-v2",
+    "tools": [
+      "shell",
+      "read_logs",
+      "inspect_processes",
+      "inspect_sockets",
+      "query_host_metrics",
+      "inspect_filesystem",
+      "probe_http",
+      "inspect_file",
+      "edit_file",
+      "manage_service"
+    ],
+    "commands": [
+      "curl",
+      "ps",
+      "top",
+      "free",
+      "df",
+      "du",
+      "ss",
+      "lsof",
+      "find",
+      "stat",
+      "openssl"
+    ]
+  },
+  "timeouts": {
+    "agent_sec": 300
+  }
+}

@@ -11,5 +11,10 @@
     "field": "image_reference",
     "healthy": "valid",
     "faulty": "invalid-tag"
+  },
+  "implementation": {
+    "strategy": "deployment",
+    "component": "frontend",
+    "fault": "image"
   }
 }

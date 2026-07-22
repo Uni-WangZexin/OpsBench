@@ -7,5 +7,5 @@
   "fault_type": "disk_usage",
   "root_cause": "占满磁盘。",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:stress"
 }

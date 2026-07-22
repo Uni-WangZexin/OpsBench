@@ -1,0 +1,9 @@
+{
+  "domain": "linux",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "resource.memory_growth",
+  "symptom": "The target host has lost most of its normal memory headroom even though request volume is low.",
+  "root_cause": "background_worker_retains_memory",
+  "expected_fix_type": "in_place_runtime_repair"
+}

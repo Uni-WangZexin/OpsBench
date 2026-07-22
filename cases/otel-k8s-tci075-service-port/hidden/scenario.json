@@ -11,5 +11,12 @@
     "field": "service_port",
     "healthy": "80",
     "faulty": "8080"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "frontendproxy",
+    "fault": "target_port",
+    "healthy": 8080,
+    "faulty": 9999
   }
 }

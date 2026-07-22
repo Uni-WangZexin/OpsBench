@@ -1,0 +1,9 @@
+{
+  "domain": "filesystem",
+  "system": "lightweight_linux_container",
+  "difficulty": "low",
+  "fault_type": "filesystem.permission_denied",
+  "symptom": "Health checks pass, but every upload request is rejected by the application.",
+  "root_cause": "upload_directory_owner_and_mode_changed",
+  "expected_fix_type": "in_place_runtime_repair"
+}

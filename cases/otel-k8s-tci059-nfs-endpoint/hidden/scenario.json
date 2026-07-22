@@ -11,5 +11,11 @@
     "field": "nfs_endpoint",
     "healthy": "available",
     "faulty": "unavailable"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "nfs-endpoint",
+    "healthy": "nfs.internal:2049",
+    "faulty": "203.0.113.1:2049"
   }
 }

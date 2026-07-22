@@ -7,5 +7,5 @@
   "fault_type": "dns_ingress",
   "root_cause": "注入网络策略（禁止DNS查询）",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:NetworkPolicy"
+  "injection": "kubernetes-real:network_policy"
 }

@@ -1,0 +1,6 @@
+{
+  "case_id": "http-dependency-port-013",
+  "implementation": {
+    "strategy": "dependency_port"
+  }
+}

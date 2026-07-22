@@ -11,5 +11,11 @@
     "field": "tls_certificate",
     "healthy": "valid",
     "faulty": "expired"
+  },
+  "implementation": {
+    "strategy": "config_probe",
+    "key": "tls-certificate",
+    "healthy": "valid",
+    "faulty": "expired"
   }
 }

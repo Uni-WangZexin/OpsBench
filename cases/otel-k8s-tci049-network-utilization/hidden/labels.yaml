@@ -7,5 +7,5 @@
   "fault_type": "network_utilization",
   "root_cause": "网络带宽过载",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Node"
+  "injection": "kubernetes-real:stress"
 }

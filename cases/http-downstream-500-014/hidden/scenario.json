@@ -1,0 +1,6 @@
+{
+  "case_id": "http-downstream-500-014",
+  "implementation": {
+    "strategy": "dependency_status"
+  }
+}

@@ -7,5 +7,5 @@
   "fault_type": "volume_zone",
   "root_cause": "EVS挂载异常",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:PersistentVolume"
+  "injection": "kubernetes-real:pending"
 }

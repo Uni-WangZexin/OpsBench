@@ -1,0 +1,9 @@
+{
+  "domain": "tls",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "tls.hostname_mismatch",
+  "symptom": "The HTTPS endpoint responds when verification is disabled, but normal clients reject its certificate.",
+  "root_cause": "certificate_san_does_not_include_target_hostname",
+  "expected_fix_type": "in_place_runtime_repair"
+}

@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-inode-exhaustion-006",
+  "implementation": {
+    "strategy": "inode_full"
+  }
+}

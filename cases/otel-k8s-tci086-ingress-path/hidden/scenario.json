@@ -11,5 +11,11 @@
     "field": "ingress_path",
     "healthy": "/",
     "faulty": "/wrong-path"
+  },
+  "implementation": {
+    "strategy": "ingress",
+    "fault": "path",
+    "healthy": "/",
+    "faulty": "/wrong-path"
   }
 }

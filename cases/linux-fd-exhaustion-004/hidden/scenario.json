@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-fd-exhaustion-004",
+  "implementation": {
+    "strategy": "fd_leak"
+  }
+}

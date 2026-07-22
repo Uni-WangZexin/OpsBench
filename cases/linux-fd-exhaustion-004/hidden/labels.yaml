@@ -1,0 +1,9 @@
+{
+  "domain": "linux",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "process.file_descriptor_leak",
+  "symptom": "Repeated report-template requests eventually fail while CPU and disk usage remain normal.",
+  "root_cause": "application_does_not_close_report_files",
+  "expected_fix_type": "in_place_runtime_repair"
+}

@@ -7,5 +7,5 @@
   "fault_type": "backend_service",
   "root_cause": "删除后端Service",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:service"
 }

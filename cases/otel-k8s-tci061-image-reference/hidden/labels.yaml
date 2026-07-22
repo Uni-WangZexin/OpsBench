@@ -7,5 +7,5 @@
   "fault_type": "image_reference",
   "root_cause": "镜像错误",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

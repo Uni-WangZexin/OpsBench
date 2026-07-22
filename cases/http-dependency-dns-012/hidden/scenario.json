@@ -1,0 +1,6 @@
+{
+  "case_id": "http-dependency-dns-012",
+  "implementation": {
+    "strategy": "dependency_dns"
+  }
+}

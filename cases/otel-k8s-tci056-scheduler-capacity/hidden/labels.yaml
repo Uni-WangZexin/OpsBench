@@ -7,5 +7,5 @@
   "fault_type": "scheduler_capacity",
   "root_cause": "资源不足",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Pod"
+  "injection": "kubernetes-real:pending"
 }

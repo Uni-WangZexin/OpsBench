@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-file-lock-018",
+  "implementation": {
+    "strategy": "file_lock"
+  }
+}

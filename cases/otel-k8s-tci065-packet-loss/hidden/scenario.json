@@ -11,5 +11,10 @@
     "field": "packet_loss",
     "healthy": "0%",
     "faulty": "50%"
+  },
+  "implementation": {
+    "strategy": "proxy",
+    "component": "frontendproxy",
+    "mode": "packet_loss"
   }
 }

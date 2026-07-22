@@ -1,0 +1,6 @@
+{
+  "case_id": "app-malformed-config-010",
+  "implementation": {
+    "strategy": "malformed_config"
+  }
+}

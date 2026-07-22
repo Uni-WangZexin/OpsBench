@@ -7,5 +7,5 @@
   "fault_type": "ip_forward",
   "root_cause": "ip_forward=0",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Sysctl"
+  "injection": "kubernetes-real:config_probe"
 }

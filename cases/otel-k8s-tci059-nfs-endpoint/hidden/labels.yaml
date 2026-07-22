@@ -7,5 +7,5 @@
   "fault_type": "nfs_endpoint",
   "root_cause": "NFS异常",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:PersistentVolume"
+  "injection": "kubernetes-real:config_probe"
 }

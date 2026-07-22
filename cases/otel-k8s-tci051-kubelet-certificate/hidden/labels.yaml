@@ -7,5 +7,5 @@
   "fault_type": "kubelet_certificate",
   "root_cause": "模拟证书过期",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Certificate"
+  "injection": "kubernetes-real:config_probe"
 }

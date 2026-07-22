@@ -10,6 +10,7 @@
       "distribution": "kubernetes-1.24+",
       "helm_chart": "open-telemetry/opentelemetry-demo",
       "chart_version": "0.11.0",
+      "values_file": "otel-values.yaml",
       "memory_requirement": "6Gi"
     }
   },

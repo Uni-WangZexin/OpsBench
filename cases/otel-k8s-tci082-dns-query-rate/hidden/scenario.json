@@ -11,5 +11,10 @@
     "field": "dns_query_rate",
     "healthy": "normal",
     "faulty": "overloaded"
+  },
+  "implementation": {
+    "strategy": "stress",
+    "mode": "dns",
+    "target": "kube-dns"
   }
 }

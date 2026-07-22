@@ -11,5 +11,12 @@
     "field": "cpu_load",
     "healthy": "normal",
     "faulty": "saturated"
+  },
+  "implementation": {
+    "strategy": "workload_stress",
+    "mode": "cpu",
+    "component": "frontend",
+    "active_threshold": 0.65,
+    "recovery_threshold": 0.35
   }
 }

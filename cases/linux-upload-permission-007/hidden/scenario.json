@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-upload-permission-007",
+  "implementation": {
+    "strategy": "upload_permission"
+  }
+}

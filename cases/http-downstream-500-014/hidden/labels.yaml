@@ -1,0 +1,9 @@
+{
+  "domain": "distributed_system",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "dependency.http_500",
+  "symptom": "The main API is healthy, but order requests fail because the local catalog dependency returns errors.",
+  "root_cause": "catalog_dependency_error_mode_enabled",
+  "expected_fix_type": "in_place_runtime_repair"
+}

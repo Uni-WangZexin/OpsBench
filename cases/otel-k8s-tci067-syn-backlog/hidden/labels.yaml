@@ -7,5 +7,5 @@
   "fault_type": "syn_backlog",
   "root_cause": "模拟SYN Flood",
   "difficulty": "Advanced",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:stress"
 }

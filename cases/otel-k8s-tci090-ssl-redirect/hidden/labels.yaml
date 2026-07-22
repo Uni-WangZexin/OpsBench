@@ -7,5 +7,5 @@
   "fault_type": "ssl_redirect",
   "root_cause": "配置冲突的Annotations",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Ingress"
+  "injection": "kubernetes-real:ingress"
 }

@@ -1,0 +1,19 @@
+services:
+  target:
+    build:
+      context: ../..
+      dockerfile: cases/linux-cpu-runaway-002/Dockerfile
+      args:
+        CASE_DIR: cases/linux-cpu-runaway-002
+    hostname: target
+    working_dir: /agent-runtime
+    cpus: 1.00
+    mem_limit: 384m
+    pids_limit: 128
+    tmpfs:
+      - /data:size=24m,nr_inodes=256,mode=0777
+      - /tmp/app-cache:size=8m,mode=0777
+    volumes:
+      - ${OPSBENCH_AGENT_SOURCE}:/agent:ro
+      - ${OPSBENCH_TASK_SOURCE}:/task/task.md:ro
+      - ${OPSBENCH_AGENT_TRACE_DIR}:/trace

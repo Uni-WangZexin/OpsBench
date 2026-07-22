@@ -1,0 +1,9 @@
+{
+  "domain": "distributed_system",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "dependency.malformed_payload",
+  "symptom": "The catalog endpoint responds, but GET /orders returns 502 and logs report response parsing failures.",
+  "root_cause": "catalog_returns_invalid_json",
+  "expected_fix_type": "in_place_runtime_repair"
+}

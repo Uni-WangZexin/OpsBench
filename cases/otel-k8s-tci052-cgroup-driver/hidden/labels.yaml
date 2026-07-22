@@ -7,5 +7,5 @@
   "fault_type": "cgroup_driver",
   "root_cause": "修改kubelet源码或配置文件触发逻辑错误",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:KubeletConfiguration"
+  "injection": "kubernetes-real:config_probe"
 }

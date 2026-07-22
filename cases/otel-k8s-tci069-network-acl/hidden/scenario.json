@@ -11,5 +11,10 @@
     "field": "network_acl",
     "healthy": "allow",
     "faulty": "deny"
+  },
+  "implementation": {
+    "strategy": "network_policy",
+    "component": "frontendproxy",
+    "fault": "deny_all"
   }
 }

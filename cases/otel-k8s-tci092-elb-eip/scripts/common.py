@@ -3,15 +3,16 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import time
+from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 
-STATE_CONFIG_MAP = "opsbench-incident-state"
-OBSERVATION_CONFIG_MAP = "opsbench-observations"
+OBSERVATION_CONFIG_MAP = "otel-demo-alert-context"
 RELEASE_NAME = "otel-demo"
+AGENT_CLUSTER_ROLE = "opsbench-agent-node-repair"
 
 
 def namespace() -> str:
@@ -78,11 +79,11 @@ def create_warning_event(scenario: dict[str, Any]) -> None:
         "regarding": {
             "apiVersion": "v1",
             "kind": "ConfigMap",
-            "name": STATE_CONFIG_MAP,
+            "name": OBSERVATION_CONFIG_MAP,
             "namespace": namespace(),
         },
         "reportingController": "opsbench.io/runner",
-        "reportingInstance": scenario["id"],
+        "reportingInstance": "otel-demo-monitor",
         "type": "Warning",
         "note": scenario["signal"],
     }
@@ -95,51 +96,6 @@ def create_warning_event(scenario: dict[str, Any]) -> None:
         check=False,
     )
     require_success(result, "create incident Event")
-
-
-def state_value(scenario: dict[str, Any]) -> str:
-    result = kubectl(
-        [
-            "-n",
-            namespace(),
-            "get",
-            "configmap",
-            STATE_CONFIG_MAP,
-            "-o",
-            f"jsonpath={{.data.{scenario['state']['field']}}}",
-        ]
-    )
-    require_success(result, "read incident state")
-    return result.stdout
-
-
-def patch_state(scenario: dict[str, Any], value: str) -> None:
-    patch = {"data": {scenario["state"]["field"]: value}}
-    result = kubectl(
-        [
-            "-n",
-            namespace(),
-            "patch",
-            "configmap",
-            STATE_CONFIG_MAP,
-            "--type=merge",
-            "-p",
-            json.dumps(patch),
-        ]
-    )
-    require_success(result, "patch incident state")
-
-
-def wait_for_state(scenario: dict[str, Any], expected: str, timeout: int = 60) -> bool:
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        try:
-            if state_value(scenario) == expected:
-                return True
-        except RuntimeError:
-            pass
-        time.sleep(1)
-    return False
 
 
 def emit(payload: dict[str, Any]) -> None:
@@ -203,6 +159,50 @@ def write_restricted_agent_kubeconfig() -> Path:
         check=False,
     )
     require_success(applied, "create restricted agent RBAC")
+    cluster_rbac = {
+        "apiVersion": "v1",
+        "kind": "List",
+        "items": [
+            {
+                "apiVersion": "rbac.authorization.k8s.io/v1",
+                "kind": "ClusterRole",
+                "metadata": {"name": AGENT_CLUSTER_ROLE},
+                "rules": [
+                    {
+                        "apiGroups": [""],
+                        "resources": ["nodes"],
+                        "verbs": ["get", "list", "watch", "patch", "update"],
+                    }
+                ],
+            },
+            {
+                "apiVersion": "rbac.authorization.k8s.io/v1",
+                "kind": "ClusterRoleBinding",
+                "metadata": {"name": agent_cluster_role_binding(ns)},
+                "subjects": [
+                    {
+                        "kind": "ServiceAccount",
+                        "name": service_account,
+                        "namespace": ns,
+                    }
+                ],
+                "roleRef": {
+                    "apiGroup": "rbac.authorization.k8s.io",
+                    "kind": "ClusterRole",
+                    "name": AGENT_CLUSTER_ROLE,
+                },
+            },
+        ],
+    }
+    cluster_applied = subprocess.run(
+        ["kubectl", "apply", "-f", "-"],
+        input=json.dumps(cluster_rbac),
+        text=True,
+        capture_output=True,
+        timeout=120,
+        check=False,
+    )
+    require_success(cluster_applied, "create restricted node repair RBAC")
     token_result = kubectl(
         ["-n", ns, "create", "token", service_account, "--duration=1h"],
         timeout=120,
@@ -221,6 +221,7 @@ def write_restricted_agent_kubeconfig() -> Path:
     cluster = next(
         item["cluster"] for item in source["clusters"] if item["name"] == cluster_name
     )
+    cluster = agent_reachable_cluster(cluster)
     restricted = {
         "apiVersion": "v1",
         "kind": "Config",
@@ -248,3 +249,30 @@ def write_restricted_agent_kubeconfig() -> Path:
     output.write_text(json.dumps(restricted), encoding="utf-8")
     output.chmod(0o600)
     return output
+
+
+def agent_cluster_role_binding(ns: str) -> str:
+    return f"{ns}-agent-node-access"[:63].rstrip("-")
+
+
+def agent_reachable_cluster(source_cluster: dict[str, Any]) -> dict[str, Any]:
+    """Translate a host-loopback API endpoint for a sibling Docker container."""
+
+    cluster = deepcopy(source_cluster)
+    server = str(cluster.get("server", ""))
+    parsed = urlsplit(server)
+    if parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
+        return cluster
+    if parsed.port is None:
+        raise RuntimeError(f"loopback Kubernetes API server has no port: {server}")
+    cluster["server"] = urlunsplit(
+        (
+            parsed.scheme,
+            f"host.docker.internal:{parsed.port}",
+            parsed.path,
+            parsed.query,
+            parsed.fragment,
+        )
+    )
+    cluster["tls-server-name"] = parsed.hostname
+    return cluster

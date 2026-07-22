@@ -11,5 +11,12 @@
     "field": "session_affinity",
     "healthy": "cookie",
     "faulty": "none"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "frontendproxy",
+    "fault": "affinity",
+    "healthy": "ClientIP",
+    "faulty": "None"
   }
 }

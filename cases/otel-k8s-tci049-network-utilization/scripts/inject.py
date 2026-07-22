@@ -9,8 +9,8 @@ from common import (
     create_warning_event,
     emit,
     load_scenario,
-    patch_state,
 )
+from faults import inject_real_fault, wait_for_fault
 
 
 def main() -> int:
@@ -18,11 +18,14 @@ def main() -> int:
     parser.add_argument("--case-dir", required=True)
     args = parser.parse_args()
     scenario = load_scenario(Path(args.case_dir))
-    patch_state(scenario, scenario["state"]["faulty"])
+    inject_real_fault(scenario)
+    active, details = wait_for_fault(scenario, expected_active=True)
+    if not active:
+        raise RuntimeError(f"real fault did not become active: {details}")
     labels = {
         "app.kubernetes.io/part-of": "opentelemetry-demo",
-        "opsbench.io/case-id": scenario["id"],
-        "opsbench.io/severity": scenario["severity"],
+        "app.kubernetes.io/component": "monitoring",
+        "observability.open-telemetry.io/severity": scenario["severity"],
     }
     apply_config_map(
         OBSERVATION_CONFIG_MAP,
@@ -35,7 +38,7 @@ def main() -> int:
         labels,
     )
     create_warning_event(scenario)
-    emit({"passed": True, "phase": "inject"})
+    emit({"passed": True, "phase": "inject", "details": details})
     return 0
 
 

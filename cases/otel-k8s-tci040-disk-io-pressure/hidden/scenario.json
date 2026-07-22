@@ -11,5 +11,10 @@
     "field": "disk_io_pressure",
     "healthy": "normal",
     "faulty": "saturated"
+  },
+  "implementation": {
+    "strategy": "workload_stress",
+    "mode": "io",
+    "component": "checkoutservice"
   }
 }

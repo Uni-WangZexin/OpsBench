@@ -1,0 +1,9 @@
+{
+  "domain": "distributed_system",
+  "system": "lightweight_linux_container",
+  "difficulty": "hard",
+  "fault_type": "dependency.timeout_mismatch",
+  "symptom": "The catalog eventually responds, but the main API abandons order requests first.",
+  "root_cause": "client_timeout_shorter_than_dependency_latency",
+  "expected_fix_type": "in_place_runtime_repair"
+}

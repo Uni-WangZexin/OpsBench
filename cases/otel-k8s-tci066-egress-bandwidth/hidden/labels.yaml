@@ -7,5 +7,5 @@
   "fault_type": "egress_bandwidth",
   "root_cause": "带宽压测",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Service"
+  "injection": "kubernetes-real:proxy"
 }

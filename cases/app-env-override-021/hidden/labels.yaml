@@ -1,0 +1,9 @@
+{
+  "domain": "configuration",
+  "system": "lightweight_linux_container",
+  "difficulty": "medium",
+  "fault_type": "configuration.environment_override",
+  "symptom": "The configuration file says port 8080, but clients cannot connect there while the process is alive.",
+  "root_cause": "environment_variable_overrides_runtime_port",
+  "expected_fix_type": "in_place_runtime_repair"
+}

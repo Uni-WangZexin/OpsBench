@@ -7,5 +7,5 @@
   "fault_type": "node_affinity",
   "root_cause": "亲和性配置",
   "difficulty": "Advanced",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

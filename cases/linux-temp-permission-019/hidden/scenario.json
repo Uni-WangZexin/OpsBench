@@ -1,0 +1,6 @@
+{
+  "case_id": "linux-temp-permission-019",
+  "implementation": {
+    "strategy": "temp_permission"
+  }
+}

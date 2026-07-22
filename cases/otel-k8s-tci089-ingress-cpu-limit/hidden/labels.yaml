@@ -7,5 +7,5 @@
   "fault_type": "ingress_cpu_limit",
   "root_cause": "限制Ingress Controller资源（人为制造CPU瓶颈）",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Deployment"
+  "injection": "kubernetes-real:deployment"
 }

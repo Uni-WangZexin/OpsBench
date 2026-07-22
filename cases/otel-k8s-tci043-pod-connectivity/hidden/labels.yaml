@@ -7,5 +7,5 @@
   "fault_type": "pod_connectivity",
   "root_cause": "网络隔离",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:NetworkPolicy"
+  "injection": "kubernetes-real:network_policy"
 }

@@ -11,5 +11,12 @@
     "field": "elb_eip",
     "healthy": "bound",
     "faulty": "unbound"
+  },
+  "implementation": {
+    "strategy": "service",
+    "component": "frontendproxy",
+    "fault": "type",
+    "healthy": "ClusterIP",
+    "faulty": "LoadBalancer"
   }
 }

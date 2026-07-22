@@ -11,5 +11,10 @@
     "field": "security_group_port_80",
     "healthy": "allow",
     "faulty": "deny"
+  },
+  "implementation": {
+    "strategy": "network_policy",
+    "component": "frontendproxy",
+    "fault": "deny_ingress"
   }
 }

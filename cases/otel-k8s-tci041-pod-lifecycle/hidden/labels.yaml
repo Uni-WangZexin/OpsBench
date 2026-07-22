@@ -7,5 +7,5 @@
   "fault_type": "pod_lifecycle",
   "root_cause": "强制重启",
   "difficulty": "Basic",
-  "simulation": "kubernetes-state:Pod"
+  "injection": "kubernetes-real:deployment"
 }

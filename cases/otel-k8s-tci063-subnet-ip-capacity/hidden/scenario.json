@@ -11,5 +11,8 @@
     "field": "subnet_ip_capacity",
     "healthy": "available",
     "faulty": "exhausted"
+  },
+  "implementation": {
+    "strategy": "quota"
   }
 }
