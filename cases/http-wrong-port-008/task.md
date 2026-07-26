@@ -1,6 +1,8 @@
 # OpsBench Task: API Is Missing From Its Published Port
 
-Clients cannot connect to the API on port 8080 even though an application process is running.
+Clients cannot connect to the API on port 8080 even though an application
+process is running. Listener settings are reconciled from a desired-state
+source, so editing only the generated application configuration is temporary.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +22,7 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies the desired state and effective listener,
+confirms the reconciler remains healthy, rejects the unintended listener, and
+checks HTTP 200 from the main health endpoint. The target container must remain
+running.

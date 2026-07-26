@@ -11,6 +11,7 @@ RUN apt-get update \
       ca-certificates \
       curl \
       iproute2 \
+      iptables \
       jq \
       lsof \
       openssl \
@@ -31,10 +32,12 @@ COPY ${CASE_DIR}/runtime/ /opt/opsbench/runtime/
 RUN chmod +x /opt/opsbench/runtime/*.sh /opt/opsbench/runtime/workload.py \
     && python3 -m compileall -q -b \
       /opt/opsbench/runtime/app.py \
+      /opt/opsbench/runtime/config-reconciler.py \
       /opt/opsbench/runtime/dependency.py \
       /opt/opsbench/runtime/workload.py \
     && rm \
       /opt/opsbench/runtime/app.py \
+      /opt/opsbench/runtime/config-reconciler.py \
       /opt/opsbench/runtime/dependency.py \
       /opt/opsbench/runtime/workload.py \
     && /opt/opsbench/runtime/generate-certs.sh \

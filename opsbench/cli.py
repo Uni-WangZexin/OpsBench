@@ -22,6 +22,7 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--agent", required=True)
     run_parser.add_argument("--results-dir", default="results")
     run_parser.add_argument("--timeout-sec", type=int)
+    run_parser.add_argument("--max-steps", type=int, default=60)
     run_parser.add_argument("--no-docker", action="store_true")
 
     leaderboard_parser = subparsers.add_parser("leaderboard")
@@ -44,9 +45,13 @@ def main(argv: list[str] | None = None) -> int:
             agent_path=args.agent,
             results_dir=args.results_dir,
             timeout_sec=args.timeout_sec,
+            max_steps=args.max_steps,
         )
         status = "PASS" if record["verification_passed"] else "FAIL"
         print(f"{status} {record['run_id']}")
+        if not record.get("agent_completed", False):
+            returncode = record.get("phases", {}).get("agent", {}).get("returncode")
+            print(f"agent: incomplete (exit {returncode})")
         print(f"trace: {record['trace_dir']}")
         return 0 if record["verification_passed"] else 1
 

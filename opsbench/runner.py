@@ -20,6 +20,9 @@ class OpsBenchRunError(RuntimeError):
     """Raised when the runner cannot complete an infrastructure phase."""
 
 
+DEFAULT_AGENT_MAX_STEPS = 60
+
+
 class OpsBenchRunner:
     def __init__(
         self,
@@ -37,7 +40,10 @@ class OpsBenchRunner:
         agent_path: str | Path,
         results_dir: str | Path = "results",
         timeout_sec: int | None = None,
+        max_steps: int = DEFAULT_AGENT_MAX_STEPS,
     ) -> dict[str, Any]:
+        if max_steps < 1:
+            raise ValueError("max_steps must be positive")
         case = load_case(case_dir)
         if case.environment_type == "kubernetes":
             with self.cluster_manager.run_lock():
@@ -46,12 +52,14 @@ class OpsBenchRunner:
                     agent_path,
                     results_dir=results_dir,
                     timeout_sec=timeout_sec,
+                    max_steps=max_steps,
                 )
         return self._run_case(
             case,
             agent_path,
             results_dir=results_dir,
             timeout_sec=timeout_sec,
+            max_steps=max_steps,
         )
 
     def _run_case(
@@ -60,6 +68,7 @@ class OpsBenchRunner:
         agent_path: str | Path,
         results_dir: str | Path,
         timeout_sec: int | None,
+        max_steps: int,
     ) -> dict[str, Any]:
         managed_kubeconfig: Path | None = None
         if case.environment_type == "kubernetes":
@@ -82,6 +91,7 @@ class OpsBenchRunner:
         compose_project = _compose_project_name(run_id)
         task_file = self._write_task_context(case, workspace_dir)
         env = self._phase_env(case, run_id, compose_project, trace_dir, workspace_dir)
+        env["LANGCHAIN_MAX_STEPS"] = str(max_steps)
         env["OPSBENCH_AGENT_SOURCE"] = str(agent.parent)
         env["OPSBENCH_TASK_SOURCE"] = str(task_file)
         if managed_kubeconfig is not None:
@@ -116,6 +126,8 @@ class OpsBenchRunner:
             )
 
             agent_env = env.copy()
+            agent_env.pop("OPSBENCH_CASE_ID", None)
+            agent_env.pop("OPSBENCH_RUN_ID", None)
             agent_env["OPSBENCH_TRACE_DIR"] = str(agent_trace_dir)
             agent_env.update(_agent_config_env(env))
             phases["agent"] = self._run_command(
@@ -157,21 +169,28 @@ class OpsBenchRunner:
             phases.get("inject", {}).get("returncode") == 0
             and phases.get("check_injected", {}).get("returncode") == 0
         )
+        agent_completed = phases.get("agent", {}).get("returncode") == 0
         verification_passed = (
-            phases.get("agent", {}).get("returncode") == 0
-            and
             phases.get("verify", {}).get("returncode") == 0
             and verification_result.get("passed") is True
         )
+        effective_agent_config = _agent_config_env(env)
         record = {
             "run_id": run_id,
             "case_id": case.id,
             "agent": agent_name,
+            "model": effective_agent_config["OPENAI_MODEL"],
             "started_at": started_at.isoformat().replace("+00:00", "Z"),
             "duration_sec": duration_sec,
             "injection_passed": injection_passed,
+            "agent_completed": agent_completed,
             "verification_passed": verification_passed,
             "score": 1.0 if verification_passed else 0.0,
+            "effective_agent_config": {
+                key: value
+                for key, value in effective_agent_config.items()
+                if key != "OPENAI_API_KEY"
+            },
             "hidden_labels": load_hidden_labels(case),
             "trace_dir": _relative_trace_path(trace_dir, results_root),
             "verification": verification_result,
@@ -394,10 +413,6 @@ def _agent_container_cmd(
         "-e",
         "OPSBENCH_AGENT_CONTAINER=1",
         "-e",
-        f"OPSBENCH_CASE_ID={env.get('OPSBENCH_CASE_ID', '')}",
-        "-e",
-        f"OPSBENCH_RUN_ID={env.get('OPSBENCH_RUN_ID', '')}",
-        "-e",
         "OPSBENCH_TRACE_DIR=/trace",
         "-e",
         f"OPSBENCH_SHELL_SERVICE={case.services[0] if case.services else ''}",
@@ -458,8 +473,6 @@ def _agent_service_exec_cmd(
     ]
     runtime_env = {
         "OPSBENCH_AGENT_CONTAINER": "1",
-        "OPSBENCH_CASE_ID": env.get("OPSBENCH_CASE_ID", ""),
-        "OPSBENCH_RUN_ID": env.get("OPSBENCH_RUN_ID", ""),
         "OPSBENCH_TRACE_DIR": "/trace",
         "OPSBENCH_SHELL_SERVICE": case.services[0] if case.services else "",
         "OPSBENCH_NAMESPACE": env.get("OPSBENCH_NAMESPACE", ""),
@@ -492,14 +505,18 @@ def _append_agent_config_env(command: list[str], env: dict[str, str]) -> None:
 
 
 def _agent_config_env(env: dict[str, str]) -> dict[str, str]:
-    defaults = {
-        "DEEPSEEK_API_KEY": "",
-        "DEEPSEEK_BASE_URL": "https://api.deepseek.com",
-        "DEEPSEEK_MODEL": "deepseek-v4-pro",
-        "LANGCHAIN_MAX_STEPS": "60",
-        "LANGCHAIN_TEMPERATURE": "0",
+    return {
+        "OPENAI_API_KEY": env.get("OPENAI_API_KEY")
+        or env.get("DEEPSEEK_API_KEY", ""),
+        "OPENAI_BASE_URL": env.get("OPENAI_BASE_URL")
+        or env.get("DEEPSEEK_BASE_URL")
+        or "https://api.deepseek.com",
+        "OPENAI_MODEL": env.get("OPENAI_MODEL")
+        or env.get("DEEPSEEK_MODEL")
+        or "deepseek-v4-pro",
+        "LANGCHAIN_MAX_STEPS": env.get("LANGCHAIN_MAX_STEPS", "60"),
+        "LANGCHAIN_TEMPERATURE": env.get("LANGCHAIN_TEMPERATURE", "0"),
     }
-    return {key: env.get(key, default) for key, default in defaults.items()}
 
 
 def _parse_last_json_object(output: str) -> dict[str, Any]:

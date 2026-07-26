@@ -1,6 +1,9 @@
 # OpsBench Task: Order Requests Time Out Waiting For Catalog
 
-The catalog eventually responds, but the main API abandons order requests first.
+The catalog eventually responds, but the main API abandons order requests
+first. Healthy order requests are expected to finish in under 600 ms; merely
+increasing the client timeout enough to wait through the current downstream
+delay is not an acceptable repair.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +23,7 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies that the downstream delay is returned to
+its operating range, order requests succeed in under 600 ms with a consistent
+client timeout, and the main health endpoint returns HTTP 200. The target
+container must remain running.

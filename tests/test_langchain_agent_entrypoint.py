@@ -39,9 +39,9 @@ class LangChainAgentEntrypointTests(unittest.TestCase):
             trace_dir = Path(temp_dir) / "trace"
             trace_dir.mkdir()
 
-            write_missing_key_error(trace_dir, RuntimeError("DEEPSEEK_API_KEY is required"))
+            write_missing_key_error(trace_dir, RuntimeError("OPENAI_API_KEY is required"))
 
-            self.assertIn("DEEPSEEK_API_KEY", (trace_dir / "trace.md").read_text(encoding="utf-8"))
+            self.assertIn("OPENAI_API_KEY", (trace_dir / "trace.md").read_text(encoding="utf-8"))
             final = json.loads((trace_dir / "final.json").read_text(encoding="utf-8"))
             self.assertEqual(final["status"], "configuration_error")
 
@@ -196,6 +196,35 @@ class LangChainAgentEntrypointTests(unittest.TestCase):
             payload = json.loads((trace_dir / "react-trace.json").read_text(encoding="utf-8"))
             self.assertEqual(payload["messages"][1]["actions"][0]["name"], "shell")
             self.assertEqual(payload["messages"][2]["tool_call_id"], "call_1")
+
+    def test_streaming_trace_survives_agent_failure(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            trace_dir = Path(temp_dir) / "trace"
+            trace_dir.mkdir()
+
+            class FailingAgent:
+                def stream(self, inputs, config, stream_mode):
+                    self.inputs = inputs
+                    self.config = config
+                    self.stream_mode = stream_mode
+                    yield {"messages": [_FakeMessage("ai", "Inspecting live state.")]}
+                    raise RuntimeError("recursion limit reached")
+
+            agent = FailingAgent()
+            with self.assertRaisesRegex(RuntimeError, "recursion limit"):
+                agent_module._stream_agent_with_trace(
+                    agent,
+                    {"messages": [{"role": "user", "content": "repair"}]},
+                    {"recursion_limit": 30},
+                    trace_dir,
+                )
+
+            payload = json.loads(
+                (trace_dir / "react-trace.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(payload["messages"][0]["content"], "Inspecting live state.")
+            self.assertEqual(agent.config["recursion_limit"], 30)
+            self.assertEqual(agent.stream_mode, "values")
 
 
 class _FakeMessage:

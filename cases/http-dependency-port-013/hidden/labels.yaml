@@ -1,9 +1,9 @@
 {
   "domain": "network",
   "system": "lightweight_linux_container",
-  "difficulty": "medium",
+  "difficulty": "hard",
   "fault_type": "network.dependency_port_mismatch",
   "symptom": "Health checks pass, but GET /orders returns 502 while the catalog process remains alive.",
-  "root_cause": "catalog_dependency_port_is_wrong",
+  "root_cause": "downstream_process_port_override_violates_service_contract",
   "expected_fix_type": "in_place_runtime_repair"
 }

@@ -44,7 +44,7 @@ def create_langchain_tools(context: ToolContext) -> list[object]:
 
     @tool
     def query_host_metrics(pid: int = 0, sample_seconds: float = 1.0) -> str:
-        """Read host memory/load or sample one process's CPU, RSS, threads, and FDs."""
+        """Read host and cgroup memory/load or sample a process's CPU, RSS, threads, and FDs."""
 
         return _tool_result(lambda: tools["query_host_metrics"](pid, sample_seconds))
 

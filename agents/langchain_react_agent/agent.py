@@ -104,11 +104,12 @@ def run_agent(args: argparse.Namespace) -> int:
 
     try:
         agent = build_agent(config, context)
-        response = agent.invoke(
+        response = _stream_agent_with_trace(
+            agent,
             {"messages": [{"role": "user", "content": user_prompt}]},
-            config={"recursion_limit": config.max_steps},
+            {"recursion_limit": config.max_steps},
+            trace_dir,
         )
-        _write_react_trace(trace_dir, response)
         final_response = _extract_final_response(response)
     except Exception as exc:  # noqa: BLE001 - agent failure is recorded for benchmark traces.
         _write_trace(trace_dir, config, "failed", str(exc))
@@ -136,6 +137,25 @@ def run_agent(args: argparse.Namespace) -> int:
         },
     )
     return 0
+
+
+def _stream_agent_with_trace(
+    agent: Any,
+    inputs: dict[str, Any],
+    config: dict[str, Any],
+    trace_dir: Path,
+) -> dict[str, Any]:
+    """Persist the latest graph state so recursion/timeout failures remain auditable."""
+
+    latest: dict[str, Any] | None = None
+    for state in agent.stream(inputs, config=config, stream_mode="values"):
+        if not isinstance(state, dict):
+            continue
+        latest = state
+        _write_react_trace(trace_dir, latest)
+    if latest is None:
+        raise RuntimeError("agent completed without producing a graph state")
+    return latest
 
 
 def main(argv: list[str] | None = None) -> int:

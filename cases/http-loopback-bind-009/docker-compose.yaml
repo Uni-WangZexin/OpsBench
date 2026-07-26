@@ -10,9 +10,11 @@ services:
     cpus: 1.00
     mem_limit: 384m
     pids_limit: 128
+    cap_add:
+      - NET_ADMIN
     tmpfs:
       - /data:size=24m,nr_inodes=256,mode=0777
-      - /tmp/app-cache:size=8m,mode=0777
+      - /var/cache/demo:size=8m,mode=0777
     volumes:
       - ${OPSBENCH_AGENT_SOURCE}:/agent:ro
       - ${OPSBENCH_TASK_SOURCE}:/task/task.md:ro

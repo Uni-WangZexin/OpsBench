@@ -1,9 +1,9 @@
 {
   "domain": "configuration",
   "system": "lightweight_linux_container",
-  "difficulty": "medium",
+  "difficulty": "hard",
   "fault_type": "configuration.feature_flag",
   "symptom": "Health and order requests pass, but GET /checkout consistently returns HTTP 500.",
-  "root_cause": "unsupported_checkout_v2_path_enabled",
+  "root_cause": "rollout_desired_state_reenables_unsupported_checkout_path",
   "expected_fix_type": "in_place_runtime_repair"
 }

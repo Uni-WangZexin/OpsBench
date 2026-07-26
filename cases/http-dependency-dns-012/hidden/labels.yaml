@@ -1,9 +1,9 @@
 {
   "domain": "network",
   "system": "lightweight_linux_container",
-  "difficulty": "medium",
+  "difficulty": "hard",
   "fault_type": "network.dependency_name_resolution",
   "symptom": "Health checks pass, but GET /orders returns 502 and dependency CPU usage is normal.",
-  "root_cause": "catalog_dependency_hostname_is_invalid",
+  "root_cause": "service_discovery_name_resolves_to_wrong_address",
   "expected_fix_type": "in_place_runtime_repair"
 }

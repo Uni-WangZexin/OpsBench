@@ -240,8 +240,41 @@ for line in pathlib.Path('/proc/meminfo').read_text().splitlines():
     mem[key] = value.strip()
 result = {
     'load_average': pathlib.Path('/proc/loadavg').read_text().strip(),
-    'memory': {key: mem.get(key, '') for key in ('MemTotal', 'MemAvailable', 'SwapTotal', 'SwapFree')},
+    'host_memory': {key: mem.get(key, '') for key in ('MemTotal', 'MemAvailable', 'SwapTotal', 'SwapFree')},
 }
+cgroup_root = pathlib.Path('/sys/fs/cgroup')
+cgroup_files = {
+    'current_bytes': 'memory.current',
+    'max_bytes': 'memory.max',
+    'high_bytes': 'memory.high',
+    'events': 'memory.events',
+    'stat': 'memory.stat',
+    'pressure': 'memory.pressure',
+}
+cgroup_memory = {}
+for key, name in cgroup_files.items():
+    path = cgroup_root / name
+    if path.is_file():
+        cgroup_memory[key] = path.read_text().strip()
+if not cgroup_memory:
+    legacy = cgroup_root / 'memory'
+    legacy_files = {
+        'current_bytes': 'memory.usage_in_bytes',
+        'max_bytes': 'memory.limit_in_bytes',
+        'stat': 'memory.stat',
+    }
+    for key, name in legacy_files.items():
+        path = legacy / name
+        if path.is_file():
+            cgroup_memory[key] = path.read_text().strip()
+try:
+    current = int(cgroup_memory.get('current_bytes', ''))
+    maximum = int(cgroup_memory.get('max_bytes', ''))
+    if maximum > 0:
+        cgroup_memory['usage_percent'] = round(current / maximum * 100, 1)
+except ValueError:
+    pass
+result['cgroup_memory'] = cgroup_memory
 if pid:
     proc = pathlib.Path('/proc') / str(pid)
     if not proc.exists():

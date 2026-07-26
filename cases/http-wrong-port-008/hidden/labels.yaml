@@ -1,9 +1,9 @@
 {
   "domain": "network",
   "system": "lightweight_linux_container",
-  "difficulty": "low",
+  "difficulty": "hard",
   "fault_type": "network.listen_port_mismatch",
   "symptom": "Clients cannot connect to the API on port 8080 even though an application process is running.",
-  "root_cause": "application_listens_on_8081",
+  "root_cause": "reconciled_listener_desired_state_drifted_to_8081",
   "expected_fix_type": "in_place_runtime_repair"
 }

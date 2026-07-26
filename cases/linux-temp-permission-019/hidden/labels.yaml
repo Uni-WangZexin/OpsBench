@@ -1,9 +1,9 @@
 {
   "domain": "filesystem",
   "system": "lightweight_linux_container",
-  "difficulty": "low",
+  "difficulty": "medium",
   "fault_type": "filesystem.temp_permission",
   "symptom": "GET /temp fails while ordinary health and read requests continue to work.",
-  "root_cause": "temporary_directory_not_writable_by_service_user",
+  "root_cause": "shared_job_store_lost_group_and_special_mode_bits",
   "expected_fix_type": "in_place_runtime_repair"
 }

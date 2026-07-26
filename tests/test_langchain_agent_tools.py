@@ -90,6 +90,43 @@ class AgentToolContractTests(unittest.TestCase):
             self.assertTrue(list((root / "trace").glob("tool-file-*.log")))
             self.assertTrue(list((root / "trace").glob("tool-file-edit-*.log")))
 
+    def test_host_metrics_distinguishes_host_and_cgroup_memory(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            context = ToolContext(
+                execution_dir=root,
+                trace_dir=root / "trace",
+                tool_standard="linux-operations-v2",
+            )
+            calls = []
+
+            def fake_run(command, **kwargs):
+                calls.append((command, kwargs))
+                return subprocess.CompletedProcess(
+                    command,
+                    0,
+                    json.dumps(
+                        {
+                            "host_memory": {"MemTotal": "8 GB"},
+                            "cgroup_memory": {
+                                "current_bytes": "1048576",
+                                "max_bytes": "402653184",
+                                "usage_percent": 0.3,
+                            },
+                        }
+                    ),
+                    "",
+                )
+
+            with patch("opsbench.agent_tools.subprocess.run", side_effect=fake_run):
+                output = create_tools(context)["query_host_metrics"](0, 0.1)
+
+            self.assertIn('"host_memory"', output)
+            self.assertIn('"cgroup_memory"', output)
+            self.assertNotIn('\n  "memory":', output)
+            self.assertIn("memory.current", calls[0][0][2])
+            self.assertIn("memory.max", calls[0][0][2])
+
     def test_file_inspection_reports_binary_without_dumping_gibberish(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -113,11 +150,11 @@ class AgentToolContractTests(unittest.TestCase):
             context = ToolContext(execution_dir=root, trace_dir=root / "trace")
             credential = "sk-examplecredential123456789"
 
-            with patch.dict(os.environ, {"DEEPSEEK_API_KEY": credential}):
+            with patch.dict(os.environ, {"OPENAI_API_KEY": credential}):
                 with patch(
                     "opsbench.agent_tools.subprocess.run",
                     return_value=subprocess.CompletedProcess(
-                        "env", 0, f"DEEPSEEK_API_KEY={credential}\n", ""
+                        "env", 0, f"OPENAI_API_KEY={credential}\n", ""
                     ),
                 ):
                     output = create_tools(context)["shell"]("env")

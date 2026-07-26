@@ -1,6 +1,8 @@
 # OpsBench Task: Unexpected Compute Saturation
 
-The target host has sustained CPU saturation and routine API checks have become inconsistent.
+The target host has sustained CPU saturation and routine API checks have become
+inconsistent. Operators report that terminating the hottest child process only
+clears the saturation briefly before the same workload returns.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -21,5 +23,6 @@ precedence are intentionally not supplied here.
 ## Success Criteria
 
 The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+works again, the compute workload remains stopped instead of being relaunched,
+the underlying CPU signal is gone, and the main health endpoint returns HTTP
+200. The target container must remain running.

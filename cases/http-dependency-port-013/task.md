@@ -1,6 +1,8 @@
 # OpsBench Task: Order Requests Cannot Connect Downstream
 
-Health checks pass, but GET /orders returns 502 while the catalog process remains alive.
+Health checks pass, but GET /orders returns 502 while the catalog process
+remains alive on an unexpected listener. The catalog service contract is port
+9001; repointing the caller to a drifted process port is not an acceptable fix.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +22,6 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies the catalog process and caller both use
+the 9001 contract, the drifted listener is gone, orders work again, and the main
+health endpoint returns HTTP 200.

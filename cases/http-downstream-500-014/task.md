@@ -1,6 +1,8 @@
 # OpsBench Task: Catalog Dependency Returns Server Errors
 
-The main API is healthy, but order requests fail because the local catalog dependency returns errors.
+The main API is healthy, but order requests fail because the local catalog
+dependency cannot read its catalog data. The catalog contains internal data and
+must remain owned by the service account without granting access to all users.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +22,7 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies that order requests work again within the
+normal latency budget, catalog ownership and least-privilege access are
+restored, and the main health endpoint returns HTTP 200. The target container
+must remain running.

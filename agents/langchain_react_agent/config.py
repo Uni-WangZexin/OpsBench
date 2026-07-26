@@ -14,13 +14,21 @@ class AgentConfig:
 
 
 def load_config() -> AgentConfig:
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
-        raise RuntimeError("DEEPSEEK_API_KEY is required for langchain-react-agent")
+        raise RuntimeError("OPENAI_API_KEY is required for langchain-react-agent")
     return AgentConfig(
         api_key=api_key,
-        base_url=os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com"),
-        model=os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-pro"),
+        base_url=(
+            os.environ.get("OPENAI_BASE_URL")
+            or os.environ.get("DEEPSEEK_BASE_URL")
+            or "https://api.deepseek.com"
+        ),
+        model=(
+            os.environ.get("OPENAI_MODEL")
+            or os.environ.get("DEEPSEEK_MODEL")
+            or "deepseek-v4-pro"
+        ),
         max_steps=int(os.environ.get("LANGCHAIN_MAX_STEPS", "60")),
         temperature=float(os.environ.get("LANGCHAIN_TEMPERATURE", "0")),
     )

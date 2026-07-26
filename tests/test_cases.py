@@ -261,6 +261,8 @@ class LoadCaseTests(unittest.TestCase):
                     "manifest.yaml",
                     "task.md",
                     "runtime/app.py",
+                    "runtime/config-reconciler.py",
+                    "runtime/dependencyctl.sh",
                     "scripts/faults.py",
                     "scripts/inject.py",
                     "scripts/check_injected.py",
@@ -278,6 +280,7 @@ class LoadCaseTests(unittest.TestCase):
             self.assertIn("cpus: 1.00", compose)
             self.assertIn("mem_limit: 384m", compose)
             self.assertIn("pids_limit: 128", compose)
+            self.assertIn("/var/cache/demo:size=8m", compose)
             self.assertNotIn("agent-runner", compose)
             self.assertNotIn("sshpass", compose)
             self.assertIn("${OPSBENCH_AGENT_SOURCE}:/agent:ro", compose)
@@ -285,11 +288,39 @@ class LoadCaseTests(unittest.TestCase):
             self.assertIn("${OPSBENCH_AGENT_TRACE_DIR}:/trace", compose)
             self.assertNotIn("${OPSBENCH_TRACE_DIR}:/trace", compose)
             self.assertNotIn("DEEPSEEK_API_KEY", compose)
+            self.assertNotIn("OPENAI_API_KEY", compose)
             self.assertNotIn("hidden", compose)
             self.assertIn("compileall", dockerfile)
+            self.assertIn("iptables", dockerfile)
+            self.assertIn("config-reconciler.py", dockerfile)
             self.assertIn("rm \\", dockerfile)
             self.assertIn("rm -f /opt/opsbench/runtime/default-config.json", entrypoint)
+            self.assertIn("/data/.stores/upload-primary", entrypoint)
+            self.assertIn("/var/cache/demo/jobs", entrypoint)
+            self.assertIn("catalog.internal", entrypoint)
+            self.assertIn("config-reconciler.pyc", entrypoint)
             self.assertIn("ulimit -n 64", (case.case_dir / "runtime" / "appctl.sh").read_text(encoding="utf-8"))
+            app_source = (case.case_dir / "runtime" / "app.py").read_text(
+                encoding="utf-8"
+            )
+            fault_source = (case.case_dir / "scripts" / "faults.py").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn('self.path == "/report-template"', app_source)
+            self.assertNotIn('self.path == "/fd-test"', app_source)
+            self.assertIn('catalog != "ready"', app_source)
+            self.assertIn("type(items) is not int", app_source)
+            self.assertIn("CONFIG_OVERLAY_PATH", app_source)
+            self.assertIn("def _workload_pids", fault_source)
+            self.assertNotIn("def _worker_pid", fault_source)
+            self.assertIn("/run/system-report.enabled", fault_source)
+            self.assertIn("dependency_delay_ms <= 250", fault_source)
+            self.assertIn("mode in {600, 640}", fault_source)
+            self.assertIn("/run/report-worker.enabled", fault_source)
+            self.assertIn("CONTROL_PLANE_CONFIG", fault_source)
+            self.assertIn("APP_CONFIG_OVERLAY", fault_source)
+            self.assertIn("_peer_block_rule_present", fault_source)
+            self.assertIn("dependencyctl.sh", fault_source)
             self.assertNotIn("/etc/opsbench", task)
             self.assertNotIn("/var/log/demo", task)
             self.assertNotIn("appctl.sh", task)

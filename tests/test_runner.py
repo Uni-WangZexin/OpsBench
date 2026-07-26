@@ -7,6 +7,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from opsbench.cli import main
 from opsbench.runner import OpsBenchRunner
@@ -31,8 +32,15 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(record["injection_passed"])
             self.assertTrue(record["verification_passed"])
             self.assertEqual(record["score"], 1.0)
+            self.assertEqual(
+                record["effective_agent_config"]["LANGCHAIN_MAX_STEPS"], "60"
+            )
+            self.assertNotIn("OPENAI_API_KEY", record["effective_agent_config"])
             self.assertEqual(record["case_id"], "fake-case")
             self.assertEqual(record["agent"], "fake-agent")
+            self.assertEqual(
+                record["model"], record["effective_agent_config"]["OPENAI_MODEL"]
+            )
             self.assertEqual(
                 record["hidden_labels"],
                 {
@@ -62,6 +70,25 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             self.assertIn("fake-case", stdout.getvalue())
 
+    def test_runner_pins_explicit_step_budget_instead_of_ambient_value(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            case_dir = self._write_fake_case(root)
+            agent_path = self._write_fake_agent(root)
+
+            with patch.dict(os.environ, {"LANGCHAIN_MAX_STEPS": "999"}):
+                record = OpsBenchRunner(use_docker=False).run(
+                    case_dir=case_dir,
+                    agent_path=agent_path,
+                    results_dir=root / "results",
+                    timeout_sec=20,
+                    max_steps=30,
+                )
+
+            self.assertEqual(
+                record["effective_agent_config"]["LANGCHAIN_MAX_STEPS"], "30"
+            )
+
     def test_runner_records_failed_verification_without_raising(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
@@ -83,7 +110,7 @@ class RunnerTests(unittest.TestCase):
             recorded = json.loads((results_dir / "runs.jsonl").read_text(encoding="utf-8"))
             self.assertEqual(recorded["run_id"], record["run_id"])
 
-    def test_agent_failure_cannot_score_even_when_environment_is_repaired(self):
+    def test_agent_failure_still_scores_when_environment_is_repaired(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             case_dir = self._write_fake_case(root, verify_passed=True)
@@ -97,9 +124,10 @@ class RunnerTests(unittest.TestCase):
             )
 
             self.assertEqual(record["phases"]["agent"]["returncode"], 1)
+            self.assertFalse(record["agent_completed"])
             self.assertTrue(record["verification"]["passed"])
-            self.assertFalse(record["verification_passed"])
-            self.assertEqual(record["score"], 0.0)
+            self.assertTrue(record["verification_passed"])
+            self.assertEqual(record["score"], 1.0)
 
     def test_docker_runner_executes_agent_inside_agent_runner_container(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -135,9 +163,11 @@ class RunnerTests(unittest.TestCase):
             self.assertNotIn(f"{trace_dir.resolve()}:/trace", agent_command)
             self.assertIn("OPSBENCH_AGENT_CONTAINER=1", agent_command)
             self.assertIn("OPSBENCH_TRACE_DIR=/trace", agent_command)
-            self.assertIn("DEEPSEEK_API_KEY", agent_command)
+            self.assertFalse(any("OPSBENCH_CASE_ID" in part for part in agent_command))
+            self.assertFalse(any("OPSBENCH_RUN_ID" in part for part in agent_command))
+            self.assertIn("OPENAI_API_KEY", agent_command)
             self.assertFalse(
-                any(part.startswith("DEEPSEEK_API_KEY=") for part in agent_command)
+                any(part.startswith("OPENAI_API_KEY=") for part in agent_command)
             )
             self.assertFalse(any("OPSBENCH_VERIFY_CMD" in part for part in agent_command))
 
@@ -180,8 +210,10 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(command[service_index + 1], "/agent/run.sh")
             self.assertIn("OPSBENCH_AGENT_CONTAINER=1", command)
             self.assertIn("OPSBENCH_TRACE_DIR=/trace", command)
-            self.assertIn("DEEPSEEK_API_KEY", command)
-            self.assertFalse(any(part.startswith("DEEPSEEK_API_KEY=") for part in command))
+            self.assertFalse(any("OPSBENCH_CASE_ID" in part for part in command))
+            self.assertFalse(any("OPSBENCH_RUN_ID" in part for part in command))
+            self.assertIn("OPENAI_API_KEY", command)
+            self.assertFalse(any(part.startswith("OPENAI_API_KEY=") for part in command))
 
     def _write_fake_case(
         self,
@@ -320,6 +352,8 @@ class RunnerTests(unittest.TestCase):
 
                 mkdir -p "$OPSBENCH_TRACE_DIR"
                 test -f "$task_file"
+                test -z "${OPSBENCH_CASE_ID:-}"
+                test -z "${OPSBENCH_RUN_ID:-}"
                 {
                   echo "fake agent read task"
                   echo "Shell service: ${OPSBENCH_SHELL_SERVICE:-}"

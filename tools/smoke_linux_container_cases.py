@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -26,6 +27,25 @@ def run(command: list[str], env: dict[str, str], timeout: int = 180) -> None:
     if result.returncode != 0:
         raise RuntimeError(
             f"command failed ({' '.join(command)}):\n{result.stdout}\n{result.stderr}"
+        )
+
+
+def run_expect_failure(
+    command: list[str], env: dict[str, str], timeout: int = 180
+) -> None:
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        env=env,
+        text=True,
+        capture_output=True,
+        timeout=timeout,
+        check=False,
+    )
+    if result.returncode == 0:
+        raise RuntimeError(
+            f"command unexpectedly passed ({' '.join(command)}):\n"
+            f"{result.stdout}\n{result.stderr}"
         )
 
 
@@ -91,6 +111,139 @@ assert len(list(trace.glob('tool-*.log'))) >= 9
         for phase in ["inject", "check_injected"]:
             run(
                 [sys.executable, str(case_dir / "scripts" / f"{phase}.py"), "--case-dir", str(case_dir)],
+                env,
+            )
+        strategy = json.loads(
+            (case_dir / "hidden" / "scenario.json").read_text(encoding="utf-8")
+        )["implementation"]["strategy"]
+        negative_controls = {
+            # Child-only process cleanup must not pass while the lifecycle source
+            # can immediately recreate the workload.
+            "cpu_runaway": [
+                "sh",
+                "-lc",
+                "for p in /proc/[0-9]*; do "
+                "test \"$(tr '\\0' ' ' <$p/cmdline 2>/dev/null)\" = "
+                "\"python3 /opt/opsbench/runtime/workload.pyc \" || continue; "
+                "kill ${p##*/}; done; sleep 0.3",
+            ],
+            "memory_growth": ["rm", "-f", "/run/system-report.pid"],
+            "fd_leak": ["/opt/opsbench/runtime/appctl.sh", "restart"],
+            "upload_permission": [
+                "sh",
+                "-lc",
+                "chown demo:demo /data/uploads && chmod 0755 /data/uploads",
+            ],
+            "wrong_port": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['port']=8080; "
+                "open(p,'w').write(json.dumps(d))\" && "
+                "/opt/opsbench/runtime/appctl.sh restart; sleep 1",
+            ],
+            "loopback_bind": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['bind']='0.0.0.0'; "
+                "open(p,'w').write(json.dumps(d))\" && "
+                "/opt/opsbench/runtime/appctl.sh restart",
+            ],
+            "malformed_config": [
+                "sh",
+                "-lc",
+                "sed -i 's/,}/}/' /etc/opsbench/app.json; "
+                "rm -f /run/demo-app.pid; "
+                "/opt/opsbench/runtime/appctl.sh start >/dev/null 2>&1 || true",
+            ],
+            "disk_full": [
+                "sh",
+                "-lc",
+                "for p in /proc/[0-9]*; do "
+                "test \"$(tr '\\0' ' ' <$p/cmdline 2>/dev/null)\" = "
+                "\"python3 /opt/opsbench/runtime/workload.pyc \" || continue; "
+                "for f in $p/fd/*; do "
+                "readlink \"$f\" 2>/dev/null | grep -q ' (deleted)$' && : >\"$f\"; "
+                "done; done",
+            ],
+            "environment_override": [
+                "sh",
+                "-lc",
+                "printf 'APP_PORT=8080\\n' >/etc/opsbench/app.env && "
+                "/opt/opsbench/runtime/appctl.sh restart",
+            ],
+            "dependency_dns": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['dependency_host']='127.0.0.1'; "
+                "open(p,'w').write(json.dumps(d))\"",
+            ],
+            "dependency_port": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['dependency_port']=9002; "
+                "open(p,'w').write(json.dumps(d))\"",
+            ],
+            # Functionality restored with world-readable sensitive data is not a
+            # valid least-privilege repair.
+            "dependency_status": [
+                "chmod",
+                "0644",
+                "/var/lib/catalog/catalog.json",
+            ],
+            # A parseable object is insufficient when field shape and types do
+            # not match the caller's contract.
+            "dependency_payload": [
+                "sh",
+                "-lc",
+                "printf '%s\\n' '{\"catalog\":[]}' "
+                ">/var/lib/catalog/catalog.json",
+            ],
+            # A larger timeout masks the slow dependency but still violates the
+            # end-to-end latency objective.
+            "dependency_timeout": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['dependency_timeout_ms']=2000; "
+                "open(p,'w').write(json.dumps(d))\" && "
+                "/opt/opsbench/runtime/appctl.sh restart",
+            ],
+            "feature_flag": [
+                "sh",
+                "-lc",
+                "python3 -c \"import json; p='/etc/opsbench/app.json'; "
+                "d=json.load(open(p)); d['feature_checkout_v2']=False; "
+                "open(p,'w').write(json.dumps(d))\"; sleep 1",
+            ],
+            # Killing one holder is temporary while its supervisor remains.
+            "file_lock": [
+                "sh",
+                "-lc",
+                "pids=$(lsof -t /run/report.lock 2>/dev/null || true); "
+                "test -z \"$pids\" || kill $pids 2>/dev/null || true; sleep 0.3",
+            ],
+            "temp_permission": [
+                "sh",
+                "-lc",
+                "chown demo:demo /tmp/app-cache && chmod 0755 /tmp/app-cache",
+            ],
+        }
+        if strategy in negative_controls:
+            run(
+                [*compose, "exec", "-T", "target", *negative_controls[strategy]],
+                env,
+            )
+            run_expect_failure(
+                [
+                    sys.executable,
+                    str(case_dir / "scripts" / "verify.py"),
+                    "--case-dir",
+                    str(case_dir),
+                ],
                 env,
             )
         repair = (

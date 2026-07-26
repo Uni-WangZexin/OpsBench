@@ -1,6 +1,9 @@
-# OpsBench Task: Catalog Response Cannot Be Parsed
+# OpsBench Task: Catalog Response Violates Its Contract
 
-The catalog endpoint responds, but GET /orders returns 502 and logs report response parsing failures.
+The catalog endpoint returns syntactically valid JSON, but GET /orders returns
+502 because the response does not satisfy the catalog contract. The caller
+expects a readiness value and a positive numeric item count; do not weaken its
+schema validation.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +23,6 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies that the catalog response has the expected
+semantics, order requests work again within the normal latency budget, and the
+main health endpoint returns HTTP 200. The target container must remain running.

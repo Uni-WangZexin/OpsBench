@@ -1,6 +1,8 @@
 # OpsBench Task: API Works Locally But Not Across The Network
 
-The service responds inside the target host but peer containers cannot reach it on port 8080.
+The service responds through 127.0.0.1 but requests addressed to the target's
+network identity fail on port 8080. The running process already reports a
+wildcard listener, so changing the application bind value is not a valid fix.
 
 Diagnose the live target container and apply the smallest durable repair. Do not
 work around the symptom by disabling validation or repeatedly restarting the
@@ -20,6 +22,7 @@ precedence are intentionally not supplied here.
 
 ## Success Criteria
 
-The benchmark independently verifies that the original user-visible operation
-works again, the underlying fault signal is gone, and the main health endpoint
-returns HTTP 200. The target container must remain running.
+The benchmark independently verifies both loopback and network-identity access,
+the wildcard application binding, removal of the underlying packet-path fault,
+and HTTP 200 from the main health endpoint. The target container must remain
+running.

@@ -123,9 +123,10 @@ One `opsbench run` follows this sequence:
 9. Record phase return codes, durations, verifier checks, score, labels, and traces.
 10. Remove the Compose environment or Kubernetes namespace in `finally`, including failed runs.
 
-A scored PASS requires both a zero agent exit code and successful hidden
-verification. Repairing the environment and then exhausting the reasoning-loop
-limit no longer receives leaderboard credit.
+A scored PASS is determined only by successful hidden verification of the live
+environment. The Agent exit status is recorded separately as `agent_completed`;
+an Agent that repairs the environment and then exhausts its reasoning-loop limit
+still receives repair credit.
 
 ### Isolation and Information Boundaries
 
@@ -137,6 +138,8 @@ The Agent runtime receives:
   `agent/` child of the run trace; benchmark phase logs are outside the mount.
 - For Kubernetes only, a namespace-restricted kubeconfig at `/kube/config`.
 - The case-declared tool standard and command clients through environment variables.
+
+Descriptive case and run identifiers are not exported into the Agent process.
 
 The Agent does **not** receive the case directory, hidden labels,
 scenario JSON, verifier scripts, verifier output, benchmark work directory,
@@ -154,6 +157,15 @@ agent ReAct/tool traces under `results/traces/<run-id>/`. The Minikube node,
 downloaded chart, and pulled container images remain cached between cases;
 namespaces and agent containers do not. Use `opsbench cluster down` after a batch
 to remove the shared Kubernetes node.
+
+Leaderboard summaries group results by model and Agent, and use only the latest
+attempt for each model/Agent/case combination, so development retries do not
+inflate the run count or pass rate. Each record also stores the effective
+non-secret Agent configuration used for reproducibility.
+For legacy records, leaderboard calculation prefers the raw
+`verification.passed` decision over the formerly coupled summary field.
+Agent graph states are written incrementally, so the last reasoning/tool state
+remains available even when the Agent reaches its step or time limit.
 
 The exact TCI038–TCI092 injection semantics and fidelity limitations are
 documented in [Kubernetes故障注入说明.md](Kubernetes故障注入说明.md).
@@ -212,11 +224,14 @@ python3 -m pip install -r agents/langchain-react-agent/requirements.txt
 Configure the model:
 
 ```bash
-export DEEPSEEK_API_KEY=...
-export DEEPSEEK_MODEL=deepseek-v4-pro
-export DEEPSEEK_BASE_URL=https://api.deepseek.com
-export LANGCHAIN_MAX_STEPS=60
+export OPENAI_API_KEY=...
+export OPENAI_MODEL=deepseek-v4-pro
+export OPENAI_BASE_URL=https://api.deepseek.com
 ```
+
+These generic variables accept any OpenAI-compatible chat-completions endpoint
+and model with tool-calling support. The former `DEEPSEEK_*` names remain
+supported as fallback aliases.
 
 Run it through the same OpsBench protocol:
 
@@ -224,13 +239,18 @@ Run it through the same OpsBench protocol:
 python3 -m opsbench.cli run \
   --case cases/postgres-missing-index-001 \
   --agent agents/langchain-react-agent/run.sh \
-  --results-dir results
+  --results-dir results \
+  --max-steps 60
 ```
+
+The runner pins the declared `--max-steps` value (default `60`) instead of
+inheriting an ambient shell value, and records it in `effective_agent_config`.
 
 For cases 002-021 the Agent process and its shell tools run directly in `target`.
 For PostgreSQL and Kubernetes they run in `agent-runner` with only the declared
-network and credentials. Pass/fail depends on model behavior, API availability,
-a zero Agent exit code, and hidden verification after the Agent exits.
+network and credentials. Pass/fail depends only on hidden verification of the
+live environment after the Agent exits. Model/API failures and the Agent exit
+code remain visible as operational diagnostics.
 
 ## Agent Protocol
 
@@ -244,7 +264,7 @@ agent/run.sh \
   --timeout-sec 300
 ```
 
-Useful environment variables:
+Useful benchmark-phase environment variables:
 
 ```text
 OPSBENCH_CASE_ID
@@ -255,6 +275,11 @@ OPSBENCH_SHELL_SERVICE
 OPSBENCH_TRACE_DIR
 OPSBENCH_AGENT_TRACE_DIR
 ```
+
+`OPSBENCH_CASE_ID` and `OPSBENCH_RUN_ID` are intentionally not forwarded into
+the evaluated Agent process because their descriptive values can reveal the
+hidden fault. Agent-visible runtime variables are limited to the tool contract,
+service/namespace access, trace location, and non-secret execution settings.
 
 With Docker enabled, cases declaring `environment.agent_service` launch through
 `docker compose exec -T <service> /agent/run.sh ...`; other cases launch through

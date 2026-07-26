@@ -1,0 +1,5 @@
+{
+  "status": 200,
+  "delay_ms": 20,
+  "data_file": "/var/lib/catalog/catalog.json"
+}

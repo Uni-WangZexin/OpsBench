@@ -8,8 +8,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
-      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
-      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-v4-pro}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.deepseek.com}
+      OPENAI_MODEL: ${OPENAI_MODEL:-deepseek-v4-pro}
       LANGCHAIN_MAX_STEPS: ${LANGCHAIN_MAX_STEPS:-30}
       LANGCHAIN_TEMPERATURE: ${LANGCHAIN_TEMPERATURE:-0}
